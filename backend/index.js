@@ -4,12 +4,14 @@ import { sequelize, User, Bid, Project, Review, Message } from './models/index.j
 import { connectFlash } from './middleware/connectflash.js';
 import session from 'express-session';
 import { syncModels } from './models/sync.js';
+import cors from 'cors';
 
 
 const app = express();
 
 app.use(express.json());
 app.use(cookieParser());
+app.use(cors());
 app.use(express.urlencoded({ extended: true }));
 app.use(session({
     secret: process.env.session_secret,
@@ -17,11 +19,13 @@ app.use(session({
     saveUninitialized: true,
     cookie: { secure: false }
 }));
-app.use(connectFlash);
+// app.use(connectFlash);
 
 // Importing routes
 
-
+app.get('/api/data', (req, res) => {
+  res.json({ message: 'Hello from the backend!' });
+});
 // Sync all models with the database
 // Pass 'true' to force sync (drops tables and recreates them)
 // Use with caution in production!
