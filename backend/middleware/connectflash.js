@@ -1,10 +1,5 @@
-function connectFlash (req, res , next){
-    res.locals.flash = req.flash();
+export const connectFlash = (req, res, next) => {
     res.locals.success = req.flash('success');
     res.locals.error = req.flash('error');
-    res.locals.info = req.flash('info');
-    res.locals.warning = req.flash('warning');
     next();
-}
-
-export default connectFlash;
+};

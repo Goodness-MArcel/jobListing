@@ -28,6 +28,15 @@ Review.init(
       type: DataTypes.BOOLEAN,
       defaultValue: false,
     },
+    // ...existing code...
+    project_id: {
+      type: DataTypes.UUID,
+      allowNull: false,
+      references: {
+        model: 'projects',
+        key: 'id',
+      },
+    },
   },
   {
     sequelize,

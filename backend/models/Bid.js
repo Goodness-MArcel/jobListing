@@ -1,5 +1,5 @@
-import { Model, DataTypes } from 'sequelize';
-import sequelize from '../config/dbconfig.js'; // Import your configured Sequelize instance
+import { Model, DataTypes } from "sequelize";
+import sequelize from "../config/dbconfig.js"; // Import your configured Sequelize instance
 
 class Bid extends Model {}
 
@@ -26,8 +26,8 @@ Bid.init(
       },
     },
     status: {
-      type: DataTypes.ENUM('pending', 'accepted', 'rejected', 'withdrawn'),
-      defaultValue: 'pending',
+      type: DataTypes.ENUM("pending", "accepted", "rejected", "withdrawn"),
+      defaultValue: "pending",
     },
     deliveryTime: {
       type: DataTypes.INTEGER, // in days
@@ -47,16 +47,24 @@ Bid.init(
       type: DataTypes.BOOLEAN,
       defaultValue: false,
     },
+    project_id: {
+      type: DataTypes.UUID,
+      allowNull: false,
+      references: {
+        model: "projects",
+        key: "id",
+      },
+    },
   },
   {
     sequelize, // Your imported Sequelize instance
-    modelName: 'Bid',
-    tableName: 'bids',
+    modelName: "Bid",
+    tableName: "bids",
     underscored: true,
     indexes: [
-      { fields: ['project_id'] },
-      { fields: ['freelancer_id'] },
-      { fields: ['status'] },
+      { fields: ["project_id"] },
+      { fields: ["freelancer_id"] },
+      { fields: ["status"] },
     ],
   }
 );
@@ -64,13 +72,13 @@ Bid.init(
 // Define associations
 Bid.associate = (models) => {
   Bid.belongsTo(models.User, {
-    foreignKey: 'freelancer_id',
-    as: 'freelancer',
+    foreignKey: "freelancer_id",
+    as: "freelancer",
   });
 
   Bid.belongsTo(models.Project, {
-    foreignKey: 'project_id',
-    as: 'project',
+    foreignKey: "project_id",
+    as: "project",
   });
 };
 

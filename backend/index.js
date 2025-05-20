@@ -1,8 +1,9 @@
 import express from 'express';
 import cookieParser from 'cookie-parser';
-import sequelize from './config/dbconfig.js';
-import connectFlash from './middleware/connectflash.js';
+import { sequelize, User, Bid, Project, Review, Message } from './models/index.js';
+import { connectFlash } from './middleware/connectflash.js';
 import session from 'express-session';
+import { syncModels } from './models/sync.js';
 
 
 const app = express();
@@ -16,6 +17,18 @@ app.use(session({
     saveUninitialized: true,
     cookie: { secure: false }
 }));
-app.use(connectFlash());
+app.use(connectFlash);
 
 // Importing routes
+
+
+// Sync all models with the database
+// Pass 'true' to force sync (drops tables and recreates them)
+// Use with caution in production!
+syncModels(false).then(() => {
+  // Start your server after models are synced
+  const PORT = process.env.PORT || 3000;
+  app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+  });
+});

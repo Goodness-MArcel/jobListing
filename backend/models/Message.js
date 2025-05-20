@@ -1,6 +1,7 @@
 import { DataTypes, Model } from 'sequelize';
 import sequelize from '../config/dbconfig.js'; // Import your configured Sequelize instance
 
+
 class Message extends Model {}
 
 // Model initialization
