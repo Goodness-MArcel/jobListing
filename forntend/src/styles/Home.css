@@ -1,0 +1,126 @@
+/* Custom styles to complement Bootstrap */
+
+/* Logo styling */
+.logo {
+  font-weight: 700;
+  color: #14a800 !important;
+  font-size: 1.8rem;
+}
+
+/* Hero section */
+.hero-section {
+  min-height: 80vh;
+  display: flex;
+  align-items: center;
+}
+
+/* Popular searches */
+.popular-searches a {
+  text-decoration: underline;
+}
+
+/* Step cards */
+.step-card {
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.step-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1) !important;
+}
+
+.step-icon {
+  width: 60px;
+  height: 60px;
+  background-color: #14a800;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+/* Category cards */
+.category-card {
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.category-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1) !important;
+}
+
+.category-icon {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+}
+
+/* Testimonial carousel */
+.testimonial-carousel .carousel-control-prev,
+.testimonial-carousel .carousel-control-next {
+  width: 40px;
+  height: 40px;
+  background-color: #14a800;
+  border-radius: 50%;
+  top: 50%;
+  transform: translateY(-50%);
+  opacity: 0.7;
+}
+
+.testimonial-carousel .carousel-control-prev {
+  left: -20px;
+}
+
+.testimonial-carousel .carousel-control-next {
+  right: -20px;
+}
+
+.testimonial-carousel .carousel-control-prev:hover,
+.testimonial-carousel .carousel-control-next:hover {
+  opacity: 1;
+}
+
+/* Social icons */
+.social-icon {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  width: 40px;
+  height: 40px;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  transition: background-color 0.3s;
+}
+
+.social-icon:hover {
+  background-color: #14a800;
+  color: white !important;
+}
+
+/* Footer links hover effect */
+footer a:hover {
+  color: white !important;
+  text-decoration: none;
+}
+
+/* Custom success color to match Upwork green */
+.btn-success, .bg-success {
+  background-color: #14a800 !important;
+  border-color: #14a800 !important;
+}
+
+.btn-outline-success {
+  color: #14a800 !important;
+  border-color: #14a800 !important;
+}
+
+.btn-outline-success:hover {
+  background-color: #14a800 !important;
+  color: white !important;
+}
+
+.text-success {
+  color: #14a800 !important;
+}

@@ -3,6 +3,7 @@ import cookieParser from 'cookie-parser';
 import { sequelize, User, Bid, Project, Review, Message } from './models/index.js';
 import { connectFlash } from './middleware/connectflash.js';
 import session from 'express-session';
+import router from './routes/index.js';
 import { syncModels } from './models/sync.js';
 import cors from 'cors';
 
@@ -19,6 +20,8 @@ app.use(session({
     saveUninitialized: true,
     cookie: { secure: false }
 }));
+
+app.use('/', router)
 // app.use(connectFlash);
 
 // Importing routes
@@ -26,6 +29,8 @@ app.use(session({
 app.get('/api/data', (req, res) => {
   res.json({ message: 'Hello from the backend!' });
 });
+
+
 // Sync all models with the database
 // Pass 'true' to force sync (drops tables and recreates them)
 // Use with caution in production!
