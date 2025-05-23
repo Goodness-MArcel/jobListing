@@ -1,0 +1,134 @@
+@import url('https://fonts.googleapis.com/css2?family=Funnel+Sans:ital,wght@0,300..800;1,300..800&display=swap');
+
+*{
+    box-sizing: border-box;
+}
+.registration-container {
+  max-width: 600px;
+  margin: 5rem auto;
+  padding: 2rem;
+  /* background: #f9f9f9; */
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+.form-group .joinAS{
+    text-align: center;
+    font-size: 20px;
+    text-transform: capitalize;
+}
+
+.registration-container h2 {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.form-group {
+  margin-bottom: 1rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+}
+.have_Account{
+    text-align: center;
+    font-size: 13px;
+    font-family: "Funnel Sans", sans-serif;
+    font-weight: 400;
+}
+a[href="/login"]{
+    color: green;
+}
+
+/* .form-group input,
+.form-group textarea {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 1rem;
+} */
+
+.role-selection {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  justify-content: center;
+}
+.role-selection .right{
+  border: thin solid #121010;
+  padding: 12px 12px;
+  border-radius: 10px;
+  position: relative;
+  height: 130px;
+  width: 200px !important;
+  place-content: center;
+  
+}
+/* .role-selection .btn {
+   background-color: red !important;
+} */
+
+.role-selection label {
+  display: flex;
+  align-items: center !important;
+  gap: 0.5rem;
+  cursor: pointer;
+  font-size: 15px;
+  display: block;
+  /* border: thick solid #121010; */
+  padding: 12px 12px;
+  text-align: center;
+  margin-top: 20px;
+}
+
+.error-message {
+  color: #d32f2f;
+  background: #ffebee;
+  padding: 0.5rem;
+  border-radius: 4px;
+  margin-bottom: 1rem;
+}
+
+button {
+  background: green;
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1rem;
+  width: 50%;
+  display: block;
+  margin: 20px auto;
+}
+button.btn{
+    background:green;
+    display: block;
+  margin: 20px auto;
+  color: white;
+}
+button:hover {
+  background: darkgreen !important;
+  color: black !important;
+}
+
+button:disabled {
+  background:rgb(122, 113, 113);
+  cursor: not-allowed;
+}
+.role-selection .upper{
+    position: absolute;
+    top: 10px;
+    left: 0;
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    padding-inline: 1rem;
+}
+.role-selection input[type="radio"]{
+    width: 40px;
+    accent-color: green;
+
+}
