@@ -58,7 +58,7 @@ User.init(
     sequelize ,// Your imported Sequelize instance
     modelName: 'User',
     tableName: 'users',
-    underscored: true,
+    // underscored: true,
     defaultScope: {
       attributes: { exclude: ['passwordHash'] },
     },

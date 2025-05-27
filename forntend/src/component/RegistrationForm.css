@@ -2,9 +2,11 @@
 
 *{
     box-sizing: border-box;
+     font-family: "Funnel Sans", sans-serif;
+
 }
 .registration-container {
-  max-width: 600px;
+  max-width: 500px;
   margin: 5rem auto;
   padding: 2rem;
   /* background: #f9f9f9; */
@@ -24,13 +26,10 @@
 
 .form-group {
   margin-bottom: 1rem;
+  /* border: thin solid #121010; */
+  width: 100%;
 }
 
-.form-group label {
-  display: block;
-  margin-bottom: 0.5rem;
-  font-weight: 500;
-}
 .have_Account{
     text-align: center;
     font-size: 13px;
@@ -41,14 +40,7 @@ a[href="/login"]{
     color: green;
 }
 
-/* .form-group input,
-.form-group textarea {
-  width: 100%;
-  padding: 0.5rem;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  font-size: 1rem;
-} */
+
 
 .role-selection {
   display: flex;
@@ -66,9 +58,6 @@ a[href="/login"]{
   place-content: center;
   
 }
-/* .role-selection .btn {
-   background-color: red !important;
-} */
 
 .role-selection label {
   display: flex;
@@ -77,7 +66,6 @@ a[href="/login"]{
   cursor: pointer;
   font-size: 15px;
   display: block;
-  /* border: thick solid #121010; */
   padding: 12px 12px;
   text-align: center;
   margin-top: 20px;
@@ -91,7 +79,7 @@ a[href="/login"]{
   margin-bottom: 1rem;
 }
 
-button {
+button[type="submit"] {
   background: green;
   color: white;
   border: none;
@@ -103,18 +91,18 @@ button {
   display: block;
   margin: 20px auto;
 }
-button.btn{
+button[type="submit"].btn{
     background:green;
     display: block;
   margin: 20px auto;
   color: white;
 }
-button:hover {
+button[type="submit"]:hover {
   background: darkgreen !important;
   color: black !important;
 }
 
-button:disabled {
+button[type="submit"]:disabled {
   background:rgb(122, 113, 113);
   cursor: not-allowed;
 }
@@ -131,4 +119,39 @@ button:disabled {
     width: 40px;
     accent-color: green;
 
+}
+
+
+form .grid-first{
+  /* border: thin solid red; */
+  display: flex;
+  gap: 2rem;
+
+}
+input[type="text"],
+input[type="email"],
+input[type="password"]{
+  display: block;
+  width: 100%;
+  background: transparent;
+  padding: 8px;
+  border-radius: 5px;
+  border: thin solid black !important;
+}
+input[type="text"]:focus{
+  outline: none;
+}
+textarea{
+  display: block;
+  width: 100%;
+  height: 100px;
+}
+textarea:focus{
+  outline: none;
+}
+
+.back-button {
+  background: transparent;
+  border: none;
+  color: green;
 }
