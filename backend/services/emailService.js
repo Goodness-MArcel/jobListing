@@ -41,6 +41,7 @@ export const sendVerificationEmail = async (user) => {
 
   // Send email
   await transporter.sendMail(mailOptions);
+  //contiue testing
 };
 
 export const verifyEmailToken = async (token) => {
