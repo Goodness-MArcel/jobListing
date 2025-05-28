@@ -24,7 +24,7 @@ const RegistrationSuccess = () => {
   const handleResendVerification = async () => {
     try {
       setResendStatus('sending');
-      const response = await axios.post('/api/auth/resend-verification', { email });
+      const response = await axios.post('https://joblisting-backend-m2wa.onrender.com/api/auth/resend-verification', { email });
       setResendStatus('success');
     } catch (error) {
       setResendStatus('error');
