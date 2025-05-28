@@ -1,5 +1,6 @@
 import { verifyEmailToken } from '../services/emailService.js';
-
+import User from '../models/User.js';
+import { sendVerificationEmail } from '../services/emailService.js';
 export const verifyEmail = async (req, res, next) => {
   try {
     const { token } = req.query;
