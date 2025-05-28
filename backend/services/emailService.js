@@ -50,6 +50,7 @@ export const verifyEmailToken = async (token) => {
       verificationTokenExpires: { [Op.gt]: new Date() }
     }
   });
+  console.log(token)
 
   if (!user) {
     throw new Error('Invalid or expired verification token');
