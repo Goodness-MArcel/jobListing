@@ -19,7 +19,7 @@ const ResendVerificationPage = () => {
 
     try {
       setIsLoading(true);
-      const response = await axios.post('http://localhost:3000/api/auth/resend-verification', { email });
+      const response = await axios.post('https://joblisting-backend-m2wa.onrender.com/api/auth/resend-verification', { email });
       setMessage(response.data.message);
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to resend verification email');

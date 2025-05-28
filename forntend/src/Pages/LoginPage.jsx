@@ -42,7 +42,7 @@ const LoginPage = () => {
 
     try {
       setIsLoading(true);
-      const response = await axios.post("http://localhost:3000/api/auth/login", formData);
+      const response = await axios.post("https://joblisting-backend-m2wa.onrender.com/api/auth/login", formData);
 
       // Store authentication data
       localStorage.setItem("token", response.data.data.token);

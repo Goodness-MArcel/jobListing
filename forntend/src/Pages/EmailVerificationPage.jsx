@@ -16,7 +16,7 @@ const EmailVerificationPage = () => {
       const token = searchParams.get('token');
       
       try {
-        const response = await axios.get(`http://localhost:3000/api/auth/verify-email?token=${token}`);
+        const response = await axios.get(`https://joblisting-backend-m2wa.onrender.com/api/auth/verify-email?token=${token}`);
         setStatus('success');
         setMessage(response.data.message);
       } catch (error) {

@@ -1,6 +1,7 @@
 import nodemailer from 'nodemailer';
 import { v4 as uuidv4 } from 'uuid';
 import  User  from '../models/User.js';
+import { Op } from 'sequelize';
 
 // Configure your email transporter
 const transporter = nodemailer.createTransport({
