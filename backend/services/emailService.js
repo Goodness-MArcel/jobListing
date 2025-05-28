@@ -68,5 +68,5 @@ export const verifyEmailToken = async (token) => {
   );
 
   // Optionally, return updated user (fresh from DB)
-  return await User.findByPk(user.id);
+//   return await User.findByPk(user.id);
 };
