@@ -45,26 +45,28 @@ export const sendVerificationEmail = async (user) => {
 };
 
 export const verifyEmailToken = async (token) => {
-  const user = await User.findOne({ 
-    where: { 
+  // Find user with matching token and unexpired token
+  const user = await User.findOne({
+    where: {
       verificationToken: token,
-      verificationTokenExpires: { [Op.gt]: new Date() }
-    }
+      verificationTokenExpires: { [Op.gt]: new Date() },
+    },
   });
-  console.log(token)
 
   if (!user) {
     throw new Error('Invalid or expired verification token');
   }
 
+  // Update user to set as verified and clear token fields
   await User.update(
-    { 
+    {
       isVerified: true,
       verificationToken: null,
-      verificationTokenExpires: null 
+      verificationTokenExpires: null,
     },
     { where: { id: user.id } }
   );
 
-  return user;
+  // Optionally, return updated user (fresh from DB)
+  return await User.findByPk(user.id);
 };
