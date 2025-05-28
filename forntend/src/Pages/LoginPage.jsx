@@ -5,6 +5,7 @@ import { FaEye, FaEyeSlash } from "react-icons/fa";
 import axios from "axios";
 import Footer from "../component/Footer.jsx";
 import CustomNavbar from "../component/Navbar.jsx";
+import '../styles/login.css'
 
 const LoginPage = () => {
   const [formData, setFormData] = useState({
@@ -65,9 +66,9 @@ const LoginPage = () => {
   return (
     <>
       <CustomNavbar />
-      <Container className="my-5">
-        <div className="mx-auto" style={{ maxWidth: "400px" }}>
-          <h2 className="text-center mb-4">Log In</h2>
+      <Container className="my-5 login-container">
+        <div className="mx-auto form" style={{ maxWidth: "400px" }}>
+          <h2 className="text-center mb-4 header">Log In</h2>
 
           {error && (
             <Alert variant="danger" className="mb-4">
@@ -121,8 +122,8 @@ const LoginPage = () => {
 
             <Button
               variant="success"
-              type="submit"
-              className="w-100 mb-3"
+              type="submit" 
+              className="w-100 mb-3 login-button"
               disabled={isLoading}
             >
               {isLoading ? "Logging in..." : "Log In"}

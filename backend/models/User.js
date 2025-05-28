@@ -1,5 +1,5 @@
-import { DataTypes, Model } from 'sequelize';
-import sequelize from '../config/dbconfig.js'
+import { DataTypes, Model } from "sequelize";
+import sequelize from "../config/dbconfig.js";
 
 class User extends Model {}
 
@@ -32,9 +32,9 @@ User.init(
       allowNull: false,
     },
     role: {
-      type: DataTypes.ENUM('client', 'freelancer', 'admin'),
+      type: DataTypes.ENUM("client", "freelancer", "admin"),
       allowNull: false,
-      defaultValue: 'client',
+      defaultValue: "client",
     },
     profileImageUrl: {
       type: DataTypes.STRING,
@@ -48,23 +48,29 @@ User.init(
     },
     isVerified: {
       type: DataTypes.BOOLEAN,
-      defaultValue: false,
+      defaultValue: true,
+    },
+    verificationToken: {
+      type: DataTypes.STRING,
+    },
+    verificationTokenExpires: {
+      type: DataTypes.DATE,
     },
     lastLogin: {
       type: DataTypes.DATE,
     },
   },
   {
-    sequelize ,// Your imported Sequelize instance
-    modelName: 'User',
-    tableName: 'users',
+    sequelize, // Your imported Sequelize instance
+    modelName: "User",
+    tableName: "users",
     // underscored: true,
     defaultScope: {
-      attributes: { exclude: ['passwordHash'] },
+      attributes: { exclude: ["passwordHash"] },
     },
     scopes: {
       withPassword: {
-        attributes: { include: ['passwordHash'] },
+        attributes: { include: ["passwordHash"] },
       },
     },
   }
@@ -74,38 +80,38 @@ User.init(
 User.associate = (models) => {
   // Projects posted by the user (as client)
   User.hasMany(models.Project, {
-    foreignKey: 'client_id',
-    as: 'projectsPosted',
+    foreignKey: "client_id",
+    as: "projectsPosted",
   });
 
   // Bids made by the user (as freelancer)
   User.hasMany(models.Bid, {
-    foreignKey: 'freelancer_id',
-    as: 'bidsMade',
+    foreignKey: "freelancer_id",
+    as: "bidsMade",
   });
 
   // Messages sent by the user
   User.hasMany(models.Message, {
-    foreignKey: 'sender_id',
-    as: 'sentMessages',
+    foreignKey: "sender_id",
+    as: "sentMessages",
   });
 
   // Messages received by the user
   User.hasMany(models.Message, {
-    foreignKey: 'receiver_id',
-    as: 'receivedMessages',
+    foreignKey: "receiver_id",
+    as: "receivedMessages",
   });
 
   // Reviews given by the user
   User.hasMany(models.Review, {
-    foreignKey: 'reviewer_id',
-    as: 'reviewsGiven',
+    foreignKey: "reviewer_id",
+    as: "reviewsGiven",
   });
 
   // Reviews about the user
   User.hasMany(models.Review, {
-    foreignKey: 'reviewee_id',
-    as: 'reviewsReceived',
+    foreignKey: "reviewee_id",
+    as: "reviewsReceived",
   });
 };
 

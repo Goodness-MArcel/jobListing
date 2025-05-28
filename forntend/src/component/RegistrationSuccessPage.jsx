@@ -29,7 +29,7 @@ const RegistrationSuccess = () => {
         <p>You can now log in to your account.</p>
         
         <button 
-          onClick={() => navigate('/login')}
+          onClick={() => navigate('/verify-email')}
           className="login-button"
         >
           Go to Login Page

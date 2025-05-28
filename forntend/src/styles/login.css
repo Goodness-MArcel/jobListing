@@ -1,0 +1,28 @@
+@import url('https://fonts.googleapis.com/css2?family=Funnel+Sans:ital,wght@0,300..800;1,300..800&display=swap');
+
+
+.login-container {
+    /* border: 2px solid #4CAF50; */
+    font-family: "Funnel Sans", sans-serif;
+}
+.form{
+    border: thin solid #4CAF50;
+    padding: 25px;
+    border-radius: 10px;
+    /* box-shadow: rgba(9, 30, 66, 0.25) 0px 1px 1px, rgba(9, 30, 66, 0.13) 0px 0px 1px 1px; */
+}
+.header{
+    font-weight: 700;
+    color: green;
+    font-size: 30px;
+}
+.login-button{
+    background-color: green;
+}
+p a{
+    text-decoration: none;
+    color: green;
+}
+p a:hover{
+    text-decoration: underline;
+}

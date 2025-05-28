@@ -76,6 +76,7 @@ export const login = async (req, res, next) => {
         details: error.message
       }
     });
+    console.log("Login error:", error);
   }
 };
 

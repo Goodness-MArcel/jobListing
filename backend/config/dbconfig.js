@@ -7,8 +7,15 @@ const sequelize = new Sequelize(
     process.env.db_password,
     {
         host: process.env.db_host,
+        port: process.env.db_port, // Add port from .env
         dialect: 'postgres',
-        logging: false
+        logging: false,
+        dialectOptions: {
+            ssl: {
+                require: true,
+                rejectUnauthorized: false, // For most managed Postgres services
+            },
+        },
     }
 );
 
@@ -17,6 +24,7 @@ try {
     console.log('database connection was successful');
 } catch(error) {
     console.log('there was an error establishing database connection');
+    console.error(error);
 }
 
 export default sequelize;

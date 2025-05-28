@@ -6,14 +6,13 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import CustomNavbar from "./component/Navbar.jsx";
-// import HomePage from "./Pages/Home.jsx";
-// import LoginPage from "./Pages/LoginPage.jsx";
-// import RegistrationForm from "./component/RegistrationForm.jsx";
-// import "./App.css";
 
 
 const HomePage = lazy(() => import("./Pages/Home.jsx"));
 const LoginPage = lazy(() => import("./Pages/LoginPage.jsx"));
+const EmailVerificationPage = lazy(()=> import("./Pages/EmailVerificationPage.jsx"));
+const ResendVerificationPage = lazy((() => import("./Pages/ResendVerificationPage.jsx")))
+const ClientDashboard = lazy(() => import("./Pages/ClientDashboard.jsx"));
 // import RegistrationSuccess from "./component/RegistrationSuccessPage.jsx";
 const RegistrationSuccessPage = lazy(() => import("./component/RegistrationSuccessPage.jsx"));
 const RegistrationForm = lazy(() => import("./component/RegistrationForm.jsx"));
@@ -36,6 +35,9 @@ function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<RegistrationForm />} />
           <Route path="/registration-success" element={<RegistrationSuccessPage />} />
+          <Route path="/client-dashboard" element={<ClientDashboard />} />
+          <Route path="/verify-email" element={<EmailVerificationPage />} />
+          <Route path="/resend-verification" element={<ResendVerificationPage />} />
         </Routes>
       </Suspense>
     </>
