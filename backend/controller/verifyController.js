@@ -1,6 +1,8 @@
 import { verifyEmailToken } from '../services/emailService.js';
 import User from '../models/User.js';
+import { Op } from 'sequelize';
 import { sendVerificationEmail } from '../services/emailService.js';
+
 export const verifyEmail = async (req, res, next) => {
   try {
     const { token } = req.query;
@@ -12,7 +14,15 @@ export const verifyEmail = async (req, res, next) => {
       });
     }
 
-    const user = await verifyEmailToken(token);
+    // Find user with the verification token and check if it's not expired
+    const user = await User.findOne({
+      where: {
+        verificationToken: token,
+        verificationTokenExpires: {
+          [Op.gt]: new Date() // Token should not be expired
+        }
+      }
+    });
 
     if (!user) {
       return res.status(400).json({
@@ -21,8 +31,26 @@ export const verifyEmail = async (req, res, next) => {
       });
     }
 
- 
-     return res.status(200).json({
+    // Check if user is already verified
+    if (user.isVerified) {
+      return res.status(200).json({
+        success: true,
+        message: 'Email is already verified!',
+        data: {
+          email: user.email,
+          isVerified: true
+        }
+      });
+    }
+
+    // Update user verification status
+    await user.update({
+      isVerified: true,
+      verificationToken: null,
+      verificationTokenExpires: null
+    });
+
+    return res.status(200).json({
       success: true,
       message: 'Email verified successfully!',
       data: {
@@ -30,7 +58,6 @@ export const verifyEmail = async (req, res, next) => {
         isVerified: true
       }
     });
- 
 
   } catch (error) {
     res.status(400).json({
