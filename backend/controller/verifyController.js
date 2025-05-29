@@ -23,12 +23,12 @@ export const verifyEmail = async (req, res, next) => {
       }
     });
 
-    if (!user) {
-      return res.status(400).json({
-        success: false,
-        message: 'Invalid or expired verification token'
-      });
-    }
+    // if (!user) {
+    //   return res.status(400).json({
+    //     success: false,
+    //     message: 'Invalid or expired verification token'
+    //   });
+    // }
 
     // Check if user is already verified
     if (user.isVerified) {
