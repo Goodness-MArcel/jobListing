@@ -207,9 +207,6 @@ const RegistrationForm = () => {
           </div>
 
           <div className="form-actions">
-            {/* <button type="button" onClick={handleBack} className="secondary">
-              Back
-            </button> */}
             <button
               type="button"
               onClick={handleBack}
@@ -217,8 +214,8 @@ const RegistrationForm = () => {
             >
               <FaArrowLeft className="back-icon" /> Back
             </button>
-            <button type="submit">
-              {formData.role === "client" ? "Complete Registration" : "Next"}
+            <button type="submit" disabled={isLoading}>
+              {isLoading ? "Creating Account..." : formData.role === "client" ? "Complete Registration" : "Next"}
             </button>
           </div>
         </form>
@@ -259,7 +256,7 @@ const RegistrationForm = () => {
               <FaArrowLeft className="back-icon" /> Back
             </button>
             <button type="submit" disabled={isLoading}>
-              {isLoading ? "Processing..." : "Complete Application"}
+              {isLoading ? "Creating Account..." : "Complete Application"}
             </button>
           </div>
         </form>

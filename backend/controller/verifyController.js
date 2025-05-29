@@ -4,9 +4,24 @@ import { sendVerificationEmail } from '../services/emailService.js';
 export const verifyEmail = async (req, res, next) => {
   try {
     const { token } = req.query;
+
+    if (!token) {
+      return res.status(400).json({
+        success: false,
+        message: 'Verification token is required'
+      });
+    }
+
     const user = await verifyEmailToken(token);
 
-    res.status(200).json({
+    if (!user) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid or expired verification token'
+      });
+    }
+
+    return res.status(200).json({
       success: true,
       message: 'Email verified successfully!',
       data: {
@@ -14,10 +29,11 @@ export const verifyEmail = async (req, res, next) => {
         isVerified: true
       }
     });
+
   } catch (error) {
     res.status(400).json({
       success: false,
-      message: error.message
+      message: error.message || 'Verification failed'
     });
   }
 };
