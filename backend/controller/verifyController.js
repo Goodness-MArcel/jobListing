@@ -1,7 +1,6 @@
-import { verifyEmailToken } from '../services/emailService.js';
 import User from '../models/User.js';
-import { Op } from 'sequelize';
 import { sendVerificationEmail } from '../services/emailService.js';
+import { Op } from 'sequelize';
 
 export const verifyEmail = async (req, res, next) => {
   try {
@@ -60,6 +59,7 @@ export const verifyEmail = async (req, res, next) => {
     });
 
   } catch (error) {
+    console.error('Email verification error:', error);
     res.status(400).json({
       success: false,
       message: error.message || 'Verification failed'
@@ -70,14 +70,28 @@ export const verifyEmail = async (req, res, next) => {
 export const resendVerification = async (req, res, next) => {
   try {
     const { email } = req.body;
+    
+    if (!email) {
+      return res.status(400).json({
+        success: false,
+        message: 'Email is required'
+      });
+    }
+
     const user = await User.findOne({ where: { email } });
 
     if (!user) {
-      throw new Error('User not found');
+      return res.status(404).json({
+        success: false,
+        message: 'User not found'
+      });
     }
 
     if (user.isVerified) {
-      throw new Error('Email is already verified');
+      return res.status(400).json({
+        success: false,
+        message: 'Email is already verified'
+      });
     }
 
     await sendVerificationEmail(user);
@@ -87,9 +101,10 @@ export const resendVerification = async (req, res, next) => {
       message: 'Verification email resent successfully'
     });
   } catch (error) {
+    console.error('Resend verification error:', error);
     res.status(400).json({
       success: false,
-      message: error.message
+      message: error.message || 'Failed to resend verification email'
     });
   }
 };
