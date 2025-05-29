@@ -48,7 +48,7 @@ User.init(
     },
     isVerified: {
       type: DataTypes.BOOLEAN,
-      defaultValue: true,
+      defaultValue: false,
     },
     verificationToken: {
       type: DataTypes.STRING,
