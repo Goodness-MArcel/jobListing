@@ -23,15 +23,19 @@ export const verifyEmail = async (req, res, next) => {
       }
     });
 
-    // if (!user) {
-    //   return res.status(400).json({
-    //     success: false,
-    //     message: 'Invalid or expired verification token'
-    //   });
-    // }
+    if (!user) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid or expired verification token'
+      });
+    }
 
-    // Check if user is already verified
     if (user.isVerified) {
+      // Optionally clear the token fields for already verified users
+      await user.update({
+        verificationToken: null,
+        verificationTokenExpires: null
+      });
       return res.status(200).json({
         success: true,
         message: 'Email is already verified!',
@@ -66,7 +70,6 @@ export const verifyEmail = async (req, res, next) => {
     });
   }
 };
-
 export const resendVerification = async (req, res, next) => {
   try {
     const { email } = req.body;
