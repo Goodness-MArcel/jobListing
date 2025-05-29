@@ -17,6 +17,7 @@ const ClientDashboard = lazy(() => import("./Pages/ClientDashboard.jsx"));
 const RegistrationSuccessPage = lazy(() => import("./component/RegistrationSuccessPage.jsx"));
 const RegistrationForm = lazy(() => import("./component/RegistrationForm.jsx"));
 // Loading component
+// anoter
 const Loading = () => (
   <div className="d-flex justify-content-center align-items-center" style={{ height: "100vh" }}>
     <div className="spinner-border text-primary" role="status">
