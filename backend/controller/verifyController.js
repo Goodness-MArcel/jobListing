@@ -21,7 +21,8 @@ export const verifyEmail = async (req, res, next) => {
       });
     }
 
-    return res.status(200).json({
+ 
+     return res.status(200).json({
       success: true,
       message: 'Email verified successfully!',
       data: {
@@ -29,6 +30,7 @@ export const verifyEmail = async (req, res, next) => {
         isVerified: true
       }
     });
+ 
 
   } catch (error) {
     res.status(400).json({
