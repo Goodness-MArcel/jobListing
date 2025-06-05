@@ -36,7 +36,7 @@ const Client_ProjectForm = () => {
                     type="text"
                     className="form-control form-control-lg"
                     id="projectTitle"
-                    placeholder="Enter a clear, descriptive project title"
+                    // placeholder="Enter a clear, descriptive project title"
                     value="kspjsp"
                   />
                 </div>
