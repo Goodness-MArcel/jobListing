@@ -1,0 +1,220 @@
+.client-project-form {
+  margin-bottom: 2rem;
+  font-size: 10px;
+}
+
+.client-project-form .card {
+  border: none;
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+  border-radius: 0.5rem;
+  overflow: hidden;
+  transition: box-shadow 0.15s ease-in-out;
+}
+
+.client-project-form .card:hover {
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+
+.client-project-form .card-header {
+  background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+  border: none;
+  padding: 1.25rem;
+}
+
+.client-project-form .card-header h5 {
+  color: white;
+  font-weight: 600;
+  margin: 0;
+}
+
+.client-project-form .card-header .btn-outline-light {
+  border-color: rgba(255, 255, 255, 0.5);
+  color: white;
+  transition: all 0.2s ease-in-out;
+}
+
+.client-project-form .card-header .btn-outline-light:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-color: white;
+  color: white;
+  transform: translateY(-1px);
+}
+
+.client-project-form .card-body {
+  padding: 2rem;
+  background-color: #f8f9fa;
+}
+
+.client-project-form .form-label {
+  color: #495057;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.client-project-form .form-label i {
+  width: 16px;
+  text-align: center;
+}
+
+.client-project-form .form-control,
+.client-project-form .form-select {
+  border: 2px solid #e9ecef;
+  border-radius: 0.375rem;
+  padding: 0.75rem 1rem;
+  font-size: 0.95rem;
+  transition: all 0.2s ease-in-out;
+  background-color: white;
+}
+
+.client-project-form .form-control:focus,
+.client-project-form .form-select:focus {
+  /* border-color: #28a745; */
+  border: none;
+  /* box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25); */
+  background-color: white;
+}
+
+.client-project-form .form-control-lg {
+  padding: 1rem 1.25rem;
+  font-size: 1.1rem;
+}
+
+.client-project-form .input-group-text {
+  background-color: #e9ecef;
+  border: 2px solid #e9ecef;
+  color: #6c757d;
+  font-weight: 500;
+}
+
+.client-project-form .form-control:focus + .input-group-text,
+.client-project-form .input-group:focus-within .input-group-text {
+  border-color: #28a745;
+  background-color: rgba(40, 167, 69, 0.1);
+  color: #28a745;
+}
+
+.client-project-form textarea.form-control {
+  resize: vertical;
+  min-height: 120px;
+}
+
+.client-project-form .form-text {
+  color: #6c757d;
+  font-size: 0.875rem;
+  margin-top: 0.5rem;
+}
+
+.client-project-form .form-text i {
+  color: #28a745;
+}
+
+.client-project-form .border-top {
+  border-color: #dee2e6 !important;
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+}
+
+.client-project-form .btn-outline-secondary {
+  border-color: #6c757d;
+  color: #6c757d;
+  padding: 0.75rem 1.5rem;
+  font-weight: 500;
+  transition: all 0.2s ease-in-out;
+}
+
+.client-project-form .btn-outline-secondary:hover {
+  background-color: #6c757d;
+  border-color: #6c757d;
+  color: white;
+  transform: translateY(-1px);
+}
+
+.client-project-form .btn-primary {
+  background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+  border: none;
+  padding: 0.75rem 2rem;
+  font-weight: 600;
+  border-radius: 0.375rem;
+  transition: all 0.2s ease-in-out;
+}
+
+.client-project-form .btn-primary:hover {
+  background: linear-gradient(135deg, #218838 0%, #1ea085 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 0.5rem 1rem rgba(40, 167, 69, 0.3);
+}
+
+.client-project-form .btn-primary:focus {
+  box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.5);
+}
+
+.client-project-form .text-muted small {
+  color: #6c757d;
+  font-size: 0.875rem;
+}
+
+.client-project-form .text-muted small i {
+  color: #28a745;
+}
+
+/* Icon colors to match the design */
+.client-project-form .text-primary {
+  color: #28a745 !important;
+}
+
+.client-project-form .text-success {
+  color: #20c997 !important;
+}
+
+.client-project-form .text-warning {
+  color: #ffc107 !important;
+}
+
+.client-project-form .text-info {
+  color: #17a2b8 !important;
+}
+
+.client-project-form .text-secondary {
+  color: #6c757d !important;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .client-project-form .card-body {
+    padding: 1.5rem;
+  }
+  
+  .client-project-form .d-flex.gap-2 {
+    flex-direction: column;
+    gap: 0.5rem !important;
+  }
+  
+  .client-project-form .btn {
+    width: 100%;
+  }
+}
+
+/* Animation for expand/collapse */
+.client-project-form .card-body {
+  animation: slideDown 0.3s ease-in-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Custom select styling */
+.client-project-form .form-select {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m1 6 7 7 7-7'/%3e%3c/svg%3e");
+}
+
+.client-project-form .form-select:focus {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%2328a745' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m1 6 7 7 7-7'/%3e%3c/svg%3e");
+}

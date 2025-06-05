@@ -2,6 +2,7 @@ import { Suspense, lazy } from "react";
 import { Routes, Route, Navigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
+import ProtectedRoute from "./component/ProtectedRoute.jsx";
 import CustomNavbar from "./component/Navbar.jsx";
 
 // Lazy-loaded components
@@ -25,16 +26,20 @@ const Loading = () => (
 function App() {
   return (
     <>
-      {/* Uncomment if you need the navbar */}
-      {/* <CustomNavbar /> */}
-      
       <Suspense fallback={<Loading />}>
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<RegistrationForm />} />
           <Route path="/registration-success" element={<RegistrationSuccessPage />} />
-          <Route path="/client-dashboard" element={<ClientDashboard />} />
+          <Route
+            path="/client-dashboard"
+            element={
+              <ProtectedRoute allowedRoles={["client"]}>
+                <ClientDashboard />
+              </ProtectedRoute>
+            }
+          />
           <Route path="/verify-email" element={<EmailVerificationPage />} />
           <Route path="/resend-verification" element={<ResendVerificationPage />} />
           {/* Catch-all route for invalid paths */}
