@@ -9,14 +9,14 @@ const Client_ProjectForm = () => {
       <div className="card border-0 shadow-sm mb-4">
         <div className="card-header bg-gradient text-white border-0">
           <div className="d-flex justify-content-between align-items-center">
-            <h5 className="mb-0 fw-semibold text-nowrap " style={{color: 'green'}}>
+            <h5 className="mb-0 fw-semibold  " style={{color: 'green'}}>
               <i className="fas fa-plus-circle me-2"></i>
               Post New Project
             </h5>
             <button 
-              className="btn btn-sm btn-outline-light d-flex justify-content-end align-items-center"
+              className="btn btn-sm btn-outline-light"
               onClick={() => setIsExpanded(!isExpanded)}
-              style={{ transition: 'transform 0.3s ease' , transform: isExpanded ? 'rotate(180deg)' : 'rotate(0deg)' , color: isExpanded ? '#ffc107' : 'green' }}
+              style={{ transition: 'transform 0.3s ease' , transform: isExpanded ? 'rotate(180deg)' : 'rotate(0deg)' , color: isExpanded ? '#ffc107' : 'green',width: '30px' }}
             >
               <i className={`fas fa-chevron-${isExpanded ? 'up' : 'down'}`}></i>
             </button>
@@ -24,7 +24,7 @@ const Client_ProjectForm = () => {
         </div>
         
         {isExpanded && (
-          <div className="card-body p-4 col-sm-12 col-md-10 col-lg-8 mx-auto">
+          <div className="card-body p-4">
             <form>
               <div className="row g-3 ">
                 <div className="col-12">
@@ -36,8 +36,7 @@ const Client_ProjectForm = () => {
                     type="text"
                     className="form-control form-control-lg"
                     id="projectTitle"
-                    // placeholder="Enter a clear, descriptive project title"
-                    value="kspjsp"
+                    placeholder="Enter a clear, descriptive project title"
                   />
                 </div>
                 
@@ -123,19 +122,19 @@ const Client_ProjectForm = () => {
                 </div>
               </div>
               
-              <div className="d-flex justify-content-between align-items-center mt-4 pt-3 border-top">
+              <div className="d-flex flex-column flex-md-row justify-content-between align-items-center gap-3 mt-4 pt-3 border-top">
                 <div className="text-muted">
-                  <small>
+                  <small className="text-nowrap">
                     <i className="fas fa-shield-alt me-1"></i>
                     Your project will be reviewed before publishing
                   </small>
                 </div>
-                <div className="d-flex gap-2">
-                  <button type="button" className="btn btn-outline-secondary">
+                <div className="d-flex  flex-sm-row gap-2">
+                  <button type="button" className="btn btn-outline-secondary text-nowrap">
                     <i className="fas fa-save me-2"></i>
                     Save Draft
                   </button>
-                  <button type="submit" className="btn btn-primary btn-lg">
+                  <button type="submit" className="btn btn-primary btn-lg text-nowrap">
                     <i className="fas fa-paper-plane me-2"></i>
                     Post Project
                   </button>

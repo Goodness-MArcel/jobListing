@@ -8,7 +8,7 @@ const Client_HeaderBar = ({ userName }) => (
           <div className="d-flex justify-content-between align-items-center">
             <div className="d-flex align-items-center">
               <div className="me-4">
-                <h3 className="mb-0 "  style={{color: 'green'}}>
+                <h3 className="mb-0 text-nowrap"  style={{color: 'green'}}>
                   <i className="fas fa-tachometer-alt me-2" style={{color: 'green'}}></i>
                   Client Dashboard
                 </h3>
@@ -34,7 +34,7 @@ const Client_HeaderBar = ({ userName }) => (
               </div>
 
               {/* User Profile */}
-              <div className="dropdown">
+              <div className="dropdown d-none d-md-block">
                 <button className="btn btn-link text-decoration-none d-flex align-items-center" type="button" data-bs-toggle="dropdown">
                   <div className="me-3 text-end">
                     <div className="fw-semibold text-dark">{userName}</div>
@@ -43,7 +43,7 @@ const Client_HeaderBar = ({ userName }) => (
                   <img
                     src="https://via.placeholder.com/45"
                     alt="Profile"
-                    className="rounded-circle border"
+                    className="rounded-circle border d-none d-md-block"
                     width="45"
                     height="45"
                   />
