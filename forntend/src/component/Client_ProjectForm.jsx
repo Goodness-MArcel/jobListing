@@ -24,9 +24,9 @@ const Client_ProjectForm = () => {
         </div>
         
         {isExpanded && (
-          <div className="card-body p-4">
+          <div className="card-body p-4 col-sm-12 col-md-10 col-lg-8 mx-auto">
             <form>
-              <div className="row g-3">
+              <div className="row g-3 ">
                 <div className="col-12">
                   <label htmlFor="projectTitle" className="form-label fw-semibold">
                     <i className="fas fa-heading me-1 text-primary"></i>
