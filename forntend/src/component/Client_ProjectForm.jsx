@@ -9,12 +9,12 @@ const Client_ProjectForm = () => {
       <div className="card border-0 shadow-sm mb-4">
         <div className="card-header bg-gradient text-white border-0">
           <div className="d-flex justify-content-between align-items-center">
-            <h5 className="mb-0 fw-semibold  " style={{color: 'green'}}>
+            <h5 className="mb-0 fw-semibold text-nowrap " style={{color: 'green'}}>
               <i className="fas fa-plus-circle me-2"></i>
               Post New Project
             </h5>
             <button 
-              className="btn btn-sm btn-outline-light"
+              className="btn btn-sm btn-outline-light d-flex justify-content-end align-items-center"
               onClick={() => setIsExpanded(!isExpanded)}
               style={{ transition: 'transform 0.3s ease' , transform: isExpanded ? 'rotate(180deg)' : 'rotate(0deg)' , color: isExpanded ? '#ffc107' : 'green' }}
             >
