@@ -1,5 +1,6 @@
 import express from 'express';
 import { verifyEmail, resendVerification } from '../controller/verifyController.js';
+import { protect , restrictTo } from '../utils/authMiddleware.js';
 // import { register } from '../controller/authController.js';
 import { register, login } from '../controller/authController.js';
 import {
@@ -41,5 +42,7 @@ router.post('/login',
 router.get('/verify-email', verifyEmail);
 router.post('/resend-verification', resendVerification);
 // Other auth routes would go here
-
+router.get('/client/dashboard', protect, restrictTo('client'), async (req, res) => {
+  console.log(req.user.id);
+});
 export default router;

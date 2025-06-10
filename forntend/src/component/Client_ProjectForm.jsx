@@ -3,7 +3,60 @@ import '../styles/Client_ProjectForm.css';
 
 const Client_ProjectForm = () => {
   const [isExpanded, setIsExpanded] = useState(false);
+  const [formData, setFormData] = useState({
+    projectTitle: '',
+    projectBudget: '',
+    projectDeadline: '',
+    projectCategory: '',
+    projectDescription: '',
+    projectSkills: ''
+  });
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({
+      ...formData,
+      [name]: value
+    });
+  }
+ const handleSubmit = async (e) => {
+  e.preventDefault();
+  
+  // Convert skills string to array
+  const skillsArray = formData.projectSkills
+    .split(',')
+    .map(skill => skill.trim())
+    .filter(skill => skill.length > 0);
 
+  const projectData = {
+    title: formData.projectTitle,
+    description: formData.projectDescription,
+    budget: parseFloat(formData.projectBudget),
+    deadline: new Date(formData.projectDeadline),
+    category: formData.projectCategory,
+    skillsRequired: skillsArray,
+    status: 'published', // or 'published' depending on which button was clicked
+    // client_id should come from your auth system
+  };
+
+  try {
+    const response = await fetch('http://localhost:3000/api/projects/add-project', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(projectData),
+    });
+    
+    if (!response.ok) throw new Error('Submission failed');
+    
+    const result = await response.json();
+    console.log('Project created:', result);
+    // Reset form or redirect
+  } catch (error) {
+    console.error('Error submitting project:', error);
+    // Handle error (show message to user)
+  }
+};
   return (
     <div className="client-project-form mt-4">
       <div className="card border-0 shadow-sm mb-4">
@@ -25,7 +78,7 @@ const Client_ProjectForm = () => {
         
         {isExpanded && (
           <div className="card-body p-4">
-            <form>
+            <form onSubmit={handleSubmit} className="needs-validation" noValidate>
               <div className="row g-3 ">
                 <div className="col-12">
                   <label htmlFor="projectTitle" className="form-label fw-semibold">
@@ -36,6 +89,9 @@ const Client_ProjectForm = () => {
                     type="text"
                     className="form-control form-control-lg"
                     id="projectTitle"
+                    onChange={handleInputChange}
+                    value={formData.projectTitle}
+                    name="projectTitle"
                     placeholder="Enter a clear, descriptive project title"
                   />
                 </div>
@@ -53,6 +109,9 @@ const Client_ProjectForm = () => {
                       id="projectBudget"
                       placeholder="0.00"
                       min="0"
+                      value={formData.projectBudget}
+                      onChange={handleInputChange}
+                      name="projectBudget"
                       step="0.01"
                     />
                   </div>
@@ -66,7 +125,10 @@ const Client_ProjectForm = () => {
                   <input
                     type="date"
                     className="form-control"
+                    value={formData.projectDeadline}
+                    name="projectDeadline"
                     id="projectDeadline"
+                    onChange={handleInputChange}
                     min={new Date().toISOString().split('T')[0]}
                   />
                 </div>
@@ -76,7 +138,7 @@ const Client_ProjectForm = () => {
                     <i className="fas fa-tags me-1 text-info"></i>
                     Category *
                   </label>
-                  <select className="form-select" id="projectCategory">
+                  <select className="form-select" id="projectCategory" name="projectCategory" value={formData.projectCategory} onChange={handleInputChange}>
                     <option value="">Select a category</option>
                     <option value="web-development">Web Development</option>
                     <option value="mobile-development">Mobile Development</option>
@@ -95,6 +157,9 @@ const Client_ProjectForm = () => {
                   <textarea
                     className="form-control"
                     id="projectDescription"
+                    value={formData.projectDescription}
+                    onChange={handleInputChange}
+                    name="projectDescription"
                     rows="5"
                     placeholder="Provide a detailed description of your project requirements, goals, and expectations..."
                   ></textarea>
@@ -113,6 +178,9 @@ const Client_ProjectForm = () => {
                     type="text"
                     className="form-control"
                     id="projectSkills"
+                    name="projectSkills"
+                    value={formData.projectSkills}
+                    onChange={handleInputChange}
                     placeholder="e.g., React, Node.js, MongoDB, UI/UX Design"
                   />
                   <div className="form-text">

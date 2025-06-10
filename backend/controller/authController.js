@@ -47,37 +47,81 @@ export const register = async (req, res, next) => {
 };
 
 
+// export const login = async (req, res, next) => {
+//   try {
+//     // Validate request
+//     const errors = validationResult(req);
+//     if (!errors.isEmpty()) {
+//       return res.status(400).json({ 
+//         success: false,
+//         errors: errors.array() 
+//       });
+//     }
+
+//     const { email, password } = req.body;
+//     console.log("Login request received:", { email, password });
+
+//     const userData = await authService.loginUser(email, password);
+
+//     res.status(200).json({
+//       success: true,
+//       data: userData
+//     });
+//   } catch (error) {
+//     res.status(error.statusCode || 500).json({
+//       success: false,
+//       message: error.message,
+//       error: {
+//         code: error.statusCode || 500,
+//         details: error.message
+//       }
+//     });
+//     console.log("Login error:", error);
+//   }
+// };
+
 export const login = async (req, res, next) => {
   try {
-    // Validate request
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ 
-        success: false,
-        errors: errors.array() 
+    const { email, password } = req.body;
+    
+    // Call the login service
+    const userData = await authService.loginUser(email, password, res);
+    
+    // Determine response based on Accept header
+    if (req.accepts('json')) {
+      // API clients expect JSON response
+      return res.status(200).json({
+        status: 'success',
+        data: userData,
+        redirect: '/dashboard' // Optional: inform client about redirect
       });
     }
-
-    const { email, password } = req.body;
-    console.log("Login request received:", { email, password });
-
-    const userData = await authService.loginUser(email, password);
-
-    res.status(200).json({
-      success: true,
-      data: userData
-    });
+    
+    // Traditional form submission - redirect to dashboard
+    return res.redirect('/dashboard');
   } catch (error) {
-    res.status(error.statusCode || 500).json({
-      success: false,
-      message: error.message,
-      error: {
-        code: error.statusCode || 500,
-        details: error.message
-      }
-    });
-    console.log("Login error:", error);
+    // Handle different types of errors appropriately
+    if (req.accepts('json')) {
+      return res.status(error.statusCode || 500).json({
+        status: 'error',
+        message: error.message
+      });
+    }
+    
+    // For traditional forms, redirect back to login with flash message
+    req.flash('error', error.message);
+    return res.redirect('/login');
   }
+};
+
+export const logout = (req, res) => {
+  authService.logoutUser(res);
+  
+  if (req.accepts('json')) {
+    return res.status(200).json({ status: 'success' });
+  }
+  
+  res.redirect('/login');
 };
 
 // import authService from "../services/authService.js";

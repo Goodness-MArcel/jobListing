@@ -108,7 +108,81 @@ export const registerUser = async (userData) => {
   }
 };
 
-export const loginUser = async (email, password) => {
+// export const loginUser = async (email, password) => {
+//   try {
+//     // 1. Check if user exists
+//     const user = await User.scope("withPassword").findOne({ where: { email } });
+//     if (!user) {
+//       const error = new Error("Invalid credentials");
+//       error.statusCode = 401;
+//       throw error;
+//     }
+//     console.log("User found:", user.email);
+
+//     // 2. Check if passwordHash exists
+//     if (!user.passwordHash) {
+//       const error = new Error(
+//         "Account is missing a password. Please reset your password or contact support."
+//       );
+//       error.statusCode = 400;
+//       throw error;
+//     }
+
+//     // 3. Verify password
+//     const isPasswordValid = await bcrypt.compare(password, user.passwordHash);
+//     if (!isPasswordValid) {
+//       const error = new Error("Invalid credentials");
+//       error.statusCode = 401;
+//       throw error;
+//     }
+
+//     // 4. Check if account is verified
+//     if (user.isVerified === false) {
+//       const error = new Error("Please verify your email first");
+//       error.statusCode = 403;
+//       throw error;
+//     }
+
+//     // 5. Update last login
+//     await user.update({ lastLogin: new Date() });
+
+//     // 6. Generate JWT token
+//     const token = jwt.sign(
+//       {
+//         id: user.id,
+//         role: user.role,
+//         email: user.email,
+//         isVerified: user.isVerified,
+//       },
+//       process.env.JWT_SECRET,
+//       { expiresIn: process.env.JWT_EXPIRE || "30d" }
+//     );
+
+//     // 7. Return user data (without password) and token
+//     return {
+//       id: user.id,
+//       firstName: user.firstName,
+//       lastName: user.lastName,
+//       email: user.email,
+//       role: user.role,
+//       bio: user.bio,
+//       skills: user.skills,
+//       isVerified: user.isVerified,
+//       token,
+//       message: "Login successful",
+//     };
+//   } catch (error) {
+//     console.error('Login service error:', error);
+//     if (!error.statusCode) {
+//       error.statusCode = 500;
+//     }
+//     throw error;
+//   }
+// };
+
+
+
+export const loginUser = async (email, password, res) => {
   try {
     // 1. Check if user exists
     const user = await User.scope("withPassword").findOne({ where: { email } });
@@ -117,7 +191,6 @@ export const loginUser = async (email, password) => {
       error.statusCode = 401;
       throw error;
     }
-    console.log("User found:", user.email);
 
     // 2. Check if passwordHash exists
     if (!user.passwordHash) {
@@ -158,7 +231,17 @@ export const loginUser = async (email, password) => {
       { expiresIn: process.env.JWT_EXPIRE || "30d" }
     );
 
-    // 7. Return user data (without password) and token
+    // 7. Set cookie with JWT token
+    res.cookie('token', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
+      domain: process.env.COOKIE_DOMAIN || 'localhost',
+      path: '/'
+    });
+
+    // 8. Return user data (without password)
     return {
       id: user.id,
       firstName: user.firstName,
@@ -168,7 +251,6 @@ export const loginUser = async (email, password) => {
       bio: user.bio,
       skills: user.skills,
       isVerified: user.isVerified,
-      token,
       message: "Login successful",
     };
   } catch (error) {
@@ -178,6 +260,13 @@ export const loginUser = async (email, password) => {
     }
     throw error;
   }
+};
+
+export const logoutUser = (res) => {
+  res.clearCookie('token', {
+    domain: process.env.COOKIE_DOMAIN || 'localhost',
+    path: '/'
+  });
 };
 
 // Other services would be exported here

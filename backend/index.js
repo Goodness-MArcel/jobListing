@@ -9,6 +9,7 @@ import helmet from 'helmet';
 import morgan from 'morgan';
 // import authRoutes from './routes/authRoutes.js';
 import router from './routes/authRoutes.js';
+import addProject from './routes/postProject_routes.js';
 import errorHandler from './utils/errorHandler.js';
 import cors from 'cors';
 
@@ -29,6 +30,7 @@ app.use(session({
 
 // app.use('/', router)
 app.use('/api/auth', router);
+app.use('/api/projects', addProject);
 
 // Error handling middleware
 app.use(errorHandler);
@@ -48,6 +50,6 @@ syncModels(false).then(() => {
   // Start your server after models are synced
   const PORT = process.env.PORT || 3000;
   app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
+    console.log(`Server running on http://localhost${PORT}`);
   });
 });

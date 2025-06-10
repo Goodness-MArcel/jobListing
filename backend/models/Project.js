@@ -46,6 +46,17 @@ Project.init(
       ),
       defaultValue: 'draft',
     },
+    category: {
+  type: DataTypes.ENUM(
+    'web-development',
+    'mobile-development',
+    'design',
+    'writing',
+    'marketing',
+    'data'
+  ),
+  allowNull: true,
+},
     skillsRequired: {
       type: DataTypes.ARRAY(DataTypes.STRING),
       defaultValue: [],

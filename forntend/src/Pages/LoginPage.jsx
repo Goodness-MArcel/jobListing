@@ -5,7 +5,7 @@ import { FaEye, FaEyeSlash } from "react-icons/fa";
 import axios from "axios";
 import Footer from "../component/Footer.jsx";
 import CustomNavbar from "../component/Navbar.jsx";
-import '../styles/login.css'
+import '../styles/login.css';
 
 const LoginPage = () => {
   const [formData, setFormData] = useState({
@@ -42,22 +42,53 @@ const LoginPage = () => {
 
     try {
       setIsLoading(true);
-      const response = await axios.post("https://joblisting-backend-m2wa.onrender.com/api/auth/login", formData);
+      
+      // Make login request with credentials
+      const response = await axios.post(
+        "https://joblisting-backend-m2wa.onrender.com/api/auth/login", 
+        {
+          email: formData.email,
+          password: formData.password
+        },
+        {
+          withCredentials: true, // Essential for cookies
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        }
+      );
 
-      // Store authentication data
-      localStorage.setItem("token", response.data.data.token);
-      localStorage.setItem("user", JSON.stringify(response.data.data));
+      // Store user data in localStorage (without sensitive info)
+      if (response.data.data) {
+        const { token, ...userData } = response.data.data;
+        localStorage.setItem("user", JSON.stringify(userData));
+      }
 
       // Redirect based on role
-      navigate(
-        response.data.data.role === "client"
-          ? "/client-dashboard"
-          : "/freelancer-dashboard"
-      );
+      const redirectPath = response.data.data?.role === "client" 
+        ? "/client-dashboard" 
+        : "/freelancer-dashboard";
+      
+      navigate(redirectPath);
+      
     } catch (err) {
-      setError(
-        err.response?.data?.message || "Login failed. Please try again."
-      );
+      console.error('Login error:', err);
+      
+      // Handle different error scenarios
+      if (err.response) {
+        if (err.response.status === 401) {
+          setError("Invalid email or password");
+        } else if (err.response.status === 403) {
+          setError("Please verify your email first");
+          navigate('/verify-email', { state: { email: formData.email } });
+        } else {
+          setError(err.response.data?.message || "Login failed. Please try again.");
+        }
+      } else if (err.request) {
+        setError("Network error. Please check your connection.");
+      } else {
+        setError("An unexpected error occurred");
+      }
     } finally {
       setIsLoading(false);
     }
@@ -78,7 +109,6 @@ const LoginPage = () => {
 
           <Form noValidate validated={validated} onSubmit={handleSubmit}>
             <Form.Group className="mb-3" controlId="formBasicEmail">
-              {/* <Form.Label>Email address</Form.Label> */}
               <Form.Control
                 type="email"
                 placeholder="Enter email"
@@ -91,8 +121,8 @@ const LoginPage = () => {
                 Please provide a valid email.
               </Form.Control.Feedback>
             </Form.Group>
+
             <Form.Group className="mb-3" controlId="formBasicPassword">
-              {/* <Form.Label>Password</Form.Label> */}
               <InputGroup>
                 <Form.Control
                   type={showPassword ? "text" : "password"}

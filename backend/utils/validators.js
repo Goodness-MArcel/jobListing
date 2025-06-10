@@ -68,3 +68,30 @@ export const validateSkillsIfFreelancer = check('skills')
     }
     return true;
   });
+
+
+
+  import { body } from 'express-validator';
+
+export const validateProject = [
+  body('title')
+    .trim()
+    .isLength({ min: 5, max: 100 })
+    .withMessage('Title must be between 5 and 100 characters'),
+  body('description')
+    .trim()
+    .isLength({ min: 20, max: 5000 })
+    .withMessage('Description must be between 20 and 5000 characters'),
+  body('budget')
+    .isFloat({ min: 5 })
+    .withMessage('Budget must be at least $5'),
+  body('deadline')
+    .isISO8601()
+    .withMessage('Invalid deadline format'),
+  body('category')
+    .optional()
+    .isIn(['web', 'mobile', 'design', 'writing', 'marketing', 'data'])
+    .withMessage('Invalid category'),
+  body('skillsRequired')
+    .optional()
+];
