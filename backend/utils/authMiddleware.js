@@ -26,6 +26,7 @@ export const protect = async (req, res, next) => {
     req.user = currentUser;
     next();
   } catch (err) {
+    console.error('Auth middleware error:', err);
     // Handle different response types
     if (req.accepts('json')) {
       return res.status(401).json({
@@ -49,9 +50,36 @@ export const restrictTo = (...roles) => {
         });
       }
       
-      return res.redirect('/dashboard'); // Or to a "not authorized" page
+      return res.redirect('/dashboard');
     }
     
     next();
   };
+};
+
+// Add verification endpoint for protected routes
+export const verifyAuth = async (req, res) => {
+  try {
+    // User is already attached by protect middleware
+    const user = req.user;
+    
+    res.status(200).json({
+      status: 'success',
+      data: {
+        id: user.id,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+        role: user.role,
+        bio: user.bio,
+        skills: user.skills,
+        isVerified: user.isVerified
+      }
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: 'error',
+      message: 'Server error during verification'
+    });
+  }
 };

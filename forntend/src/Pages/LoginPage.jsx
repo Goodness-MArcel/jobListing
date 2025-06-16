@@ -43,9 +43,9 @@ const LoginPage = () => {
     try {
       setIsLoading(true);
       
-      // Make login request with credentials
+      // Make login request with credentials - Fixed URL
       const response = await axios.post(
-        "https://joblisting-backend-m2wa.onrender.com/api/auth/login", 
+        "http://localhost:3000/api/auth/login", // Fixed port number
         {
           email: formData.email,
           password: formData.password
@@ -60,7 +60,7 @@ const LoginPage = () => {
 
       // Store user data in localStorage (without sensitive info)
       if (response.data.data) {
-        const { token, ...userData } = response.data.data;
+        const userData = response.data.data;
         localStorage.setItem("user", JSON.stringify(userData));
       }
 

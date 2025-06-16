@@ -1,16 +1,17 @@
 import React, { useState } from "react";
 import '../styles/Client_ProjectForm.css';
 
-const Client_ProjectForm = () => {
+const Client_ProjectForm = ({userId}) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [formData, setFormData] = useState({
     projectTitle: '',
     projectBudget: '',
     projectDeadline: '',
     projectCategory: '',
-    projectDescription: '',
+    projectDescription: '', 
     projectSkills: ''
   });
+  const [alert, setAlert] = useState({ show: false, message: '', type: '' });
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData({
@@ -39,7 +40,7 @@ const Client_ProjectForm = () => {
   };
 
   try {
-    const response = await fetch('http://localhost:3000/api/projects/add-project', {
+    const response = await fetch(`http://localhost:3000/api/projects/add-project?client_id=${userId}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -50,11 +51,22 @@ const Client_ProjectForm = () => {
     if (!response.ok) throw new Error('Submission failed');
     
     const result = await response.json();
+      setAlert({ show: true, message: 'Project created successfully!', type: 'success' });
     console.log('Project created:', result);
     // Reset form or redirect
+    setFormData({
+      projectTitle: '',
+      projectBudget: '',
+      projectDeadline: '',
+      projectCategory: '',
+      projectDescription: '',
+      projectSkills: ''
+    });
+
   } catch (error) {
     console.error('Error submitting project:', error);
     // Handle error (show message to user)
+    setAlert({ show: true, message: 'Error submitting project. Please try again.', type: 'danger' });
   }
 };
   return (
@@ -75,6 +87,13 @@ const Client_ProjectForm = () => {
             </button>
           </div>
         </div>
+
+         {alert.show && (
+          <div className={`alert alert-${alert.type} m-3`} role="alert">
+            {alert.message}
+            <button className="btn-close" aria-label="close"></button>
+          </div>
+        )}
         
         {isExpanded && (
           <div className="card-body p-4">
