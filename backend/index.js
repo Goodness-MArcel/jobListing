@@ -1,7 +1,8 @@
 import express from 'express';
+import http from 'http';
 import cookieParser from 'cookie-parser';
 import { sequelize, User, Bid, Project, Review, Message } from './models/index.js';
-import { connectFlash } from './middleware/connectflash.js';
+import { initializeSocket } from './socketService.js';
 import session from 'express-session';
 // import router from './routes/index.js';
 import { syncModels } from './models/sync.js';
@@ -15,6 +16,8 @@ import cors from 'cors';
 
 
 const app = express();
+const server = http.createServer(app);
+const io = initializeSocket(server);
 const corsOptions = {
   origin: function (origin, callback) {
     // Allow requests with no origin (like mobile apps or curl requests)
@@ -45,6 +48,11 @@ app.use(cors(corsOptions));
 app.use(express.json());
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
+app.use((req, res, next) => {
+  req.io = io;
+  next();
+});
+
 app.use(session({
     secret: process.env.session_secret,
     resave: false,

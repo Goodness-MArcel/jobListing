@@ -5,6 +5,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import Client_HeaderBar from "../component/Client_HeaderBar.jsx";
 import Footer from "../component/Footer.jsx";
 import "../styles/clientdashbord.css";
+// import {useSocket} from '../context/SocketContext.jsx';
 
 // Lazy-loaded components
 const ProjectList = lazy(() => import("../component/Project_list.jsx"));
@@ -31,6 +32,15 @@ const ClientDashboard = () => {
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  //  const { joinClientRoom, connected } = useSocket();
+
+  // useEffect(() => {
+  //   // Join client-specific room when dashboard loads
+  //   const clientId = localStorage.getItem("client_id") || sessionStorage.getItem("client_id");
+  //   if (clientId && connected) {
+  //     joinClientRoom(clientId);
+  //   }
+  // }, [connected, joinClientRoom]);
 
   useEffect(() => {
     // Get user data from context or localStorage

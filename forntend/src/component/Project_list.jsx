@@ -5,6 +5,8 @@ function ProjectList({ clientId }) {
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [editingProject, setEditingProject] = useState(null);
+  const [showEditModal, setShowEditModal] = useState(false);
   const [pagination, setPagination] = useState({
     currentPage: 1,
     totalPages: 1,
@@ -68,6 +70,127 @@ function ProjectList({ clientId }) {
       setProjects([]);
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Delete project function
+  const handleDeleteProject = async (projectId) => {
+    if (!window.confirm("Are you sure you want to delete this project? This action cannot be undone.")) {
+      return;
+    }
+
+    try {
+      const currentClientId =
+        clientId ||
+        localStorage.getItem("client_id") ||
+        sessionStorage.getItem("client_id");
+
+      if (!currentClientId) {
+        throw new Error("Client ID not found. Please login again.");
+      }
+
+      const response = await fetch(
+        `http://localhost:3000/api/projects/projects/${projectId}?client_id=${currentClientId}`,
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const result = await response.json();
+
+      if (result.success) {
+        // Remove the deleted project from the local state
+        setProjects(projects.filter(project => project.id !== projectId));
+        alert("Project deleted successfully!");
+        
+        // Refresh the projects list to update pagination
+        fetchProjects(filter, pagination.currentPage);
+      } else {
+        throw new Error(result.message || "Failed to delete project");
+      }
+    } catch (err) {
+      console.error("Error deleting project:", err);
+      alert(`Error deleting project: ${err.message}`);
+    }
+  };
+
+  // Edit project function
+  const handleEditProject = (project) => {
+    setEditingProject({
+      id: project.id,
+      title: project.title,
+      description: project.description,
+      budget: project.budget,
+      deadline: new Date(project.deadline).toISOString().split('T')[0],
+      category: project.category || '',
+      skillsRequired: Array.isArray(project.skillsRequired) ? project.skillsRequired.join(', ') : '',
+      status: project.status
+    });
+    setShowEditModal(true);
+  };
+
+  // Update project function
+  const handleUpdateProject = async (e) => {
+    e.preventDefault();
+    
+    try {
+      const currentClientId =
+        clientId ||
+        localStorage.getItem("client_id") ||
+        sessionStorage.getItem("client_id");
+
+      if (!currentClientId) {
+        throw new Error("Client ID not found. Please login again.");
+      }
+
+      const updateData = {
+        title: editingProject.title,
+        description: editingProject.description,
+        budget: parseFloat(editingProject.budget),
+        deadline: editingProject.deadline,
+        category: editingProject.category,
+        skillsRequired: editingProject.skillsRequired.split(',').map(skill => skill.trim()).filter(skill => skill),
+        status: editingProject.status
+      };
+
+      const response = await fetch(
+        `http://localhost:3000/api/projects/projects/${editingProject.id}?client_id=${currentClientId}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(updateData),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const result = await response.json();
+
+      if (result.success) {
+        // Update the project in the local state
+        setProjects(projects.map(project => 
+          project.id === editingProject.id ? result.data : project
+        ));
+        setShowEditModal(false);
+        setEditingProject(null);
+        alert("Project updated successfully!");
+      } else {
+        throw new Error(result.message || "Failed to update project");
+      }
+    } catch (err) {
+      console.error("Error updating project:", err);
+      alert(`Error updating project: ${err.message}`);
     }
   };
 
@@ -243,7 +366,10 @@ function ProjectList({ clientId }) {
                             <i className="fas fa-eye me-1"></i>
                             View Bids
                           </button>
-                          <button className="btn btn-sm btn-outline-secondary">
+                          <button 
+                            className="btn btn-sm btn-outline-secondary"
+                            onClick={() => handleEditProject(project)}
+                          >
                             <i className="fas fa-edit me-1"></i>
                             Edit
                           </button>
@@ -269,7 +395,10 @@ function ProjectList({ clientId }) {
                             <i className="fas fa-paper-plane me-1"></i>
                             Publish
                           </button>
-                          <button className="btn btn-sm btn-outline-secondary">
+                          <button 
+                            className="btn btn-sm btn-outline-secondary"
+                            onClick={() => handleEditProject(project)}
+                          >
                             <i className="fas fa-edit me-1"></i>
                             Edit
                           </button>
@@ -306,9 +435,13 @@ function ProjectList({ clientId }) {
                             <hr className="dropdown-divider" />
                           </li>
                           <li>
-                            <a className="dropdown-item text-danger" href="#">
+                            <button 
+                              className="dropdown-item text-danger"
+                              onClick={() => handleDeleteProject(project.id)}
+                              style={{ border: 'none', background: 'none', width: '100%', textAlign: 'left' }}
+                            >
                               <i className="fas fa-trash me-2"></i>Delete
-                            </a>
+                            </button>
                           </li>
                         </ul>
                       </div>
@@ -429,6 +562,170 @@ function ProjectList({ clientId }) {
                 </ul>
               </nav>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* Edit Project Modal */}
+      {showEditModal && editingProject && (
+        <div className="modal fade show" style={{ display: 'block', backgroundColor: 'rgba(0,0,0,0.5)' }}>
+          <div className="modal-dialog modal-lg">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title">
+                  <i className="fas fa-edit me-2"></i>
+                  Edit Project
+                </h5>
+                <button
+                  type="button"
+                  className="btn-close"
+                  onClick={() => {
+                    setShowEditModal(false);
+                    setEditingProject(null);
+                  }}
+                ></button>
+              </div>
+              <form onSubmit={handleUpdateProject}>
+                <div className="modal-body">
+                  <div className="row">
+                    <div className="col-md-12 mb-3">
+                      <label htmlFor="editTitle" className="form-label">
+                        Project Title <span className="text-danger">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        className="form-control"
+                        id="editTitle"
+                        value={editingProject.title}
+                        onChange={(e) =>
+                          setEditingProject({ ...editingProject, title: e.target.value })
+                        }
+                        required
+                      />
+                    </div>
+
+                    <div className="col-md-12 mb-3">
+                      <label htmlFor="editDescription" className="form-label">
+                        Description <span className="text-danger">*</span>
+                      </label>
+                      <textarea
+                        className="form-control"
+                        id="editDescription"
+                        rows="4"
+                        value={editingProject.description}
+                        onChange={(e) =>
+                          setEditingProject({ ...editingProject, description: e.target.value })
+                        }
+                        required
+                      ></textarea>
+                    </div>
+
+                    <div className="col-md-6 mb-3">
+                      <label htmlFor="editBudget" className="form-label">
+                        Budget ($) <span className="text-danger">*</span>
+                      </label>
+                      <input
+                        type="number"
+                        className="form-control"
+                        id="editBudget"
+                        min="1"
+                        step="0.01"
+                        value={editingProject.budget}
+                        onChange={(e) =>
+                          setEditingProject({ ...editingProject, budget: e.target.value })
+                        }
+                        required
+                      />
+                    </div>
+
+                    <div className="col-md-6 mb-3">
+                      <label htmlFor="editDeadline" className="form-label">
+                        Deadline <span className="text-danger">*</span>
+                      </label>
+                      <input
+                        type="date"
+                        className="form-control"
+                        id="editDeadline"
+                        value={editingProject.deadline}
+                        onChange={(e) =>
+                          setEditingProject({ ...editingProject, deadline: e.target.value })
+                        }
+                        required
+                      />
+                    </div>
+
+                    <div className="col-md-6 mb-3">
+                      <label htmlFor="editCategory" className="form-label">
+                        Category
+                      </label>
+                      <input
+                        type="text"
+                        className="form-control"
+                        id="editCategory"
+                        value={editingProject.category}
+                        onChange={(e) =>
+                          setEditingProject({ ...editingProject, category: e.target.value })
+                        }
+                      />
+                    </div>
+
+                    <div className="col-md-6 mb-3">
+                      <label htmlFor="editStatus" className="form-label">
+                        Status
+                      </label>
+                      <select
+                        className="form-select"
+                        id="editStatus"
+                        value={editingProject.status}
+                        onChange={(e) =>
+                          setEditingProject({ ...editingProject, status: e.target.value })
+                        }
+                      >
+                        <option value="draft">Draft</option>
+                        <option value="active">Active</option>
+                        <option value="in-progress">In Progress</option>
+                        <option value="completed">Completed</option>
+                      </select>
+                    </div>
+
+                    <div className="col-md-12 mb-3">
+                      <label htmlFor="editSkills" className="form-label">
+                        Skills Required
+                      </label>
+                      <input
+                        type="text"
+                        className="form-control"
+                        id="editSkills"
+                        placeholder="Enter skills separated by commas (e.g., JavaScript, React, Node.js)"
+                        value={editingProject.skillsRequired}
+                        onChange={(e) =>
+                          setEditingProject({ ...editingProject, skillsRequired: e.target.value })
+                        }
+                      />
+                      <div className="form-text">
+                        Separate multiple skills with commas
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div className="modal-footer">
+                  <button
+                    type="button"
+                    className="btn btn-secondary"
+                    onClick={() => {
+                      setShowEditModal(false);
+                      setEditingProject(null);
+                    }}
+                  >
+                    Cancel
+                  </button>
+                  <button type="submit" className="btn btn-primary">
+                    <i className="fas fa-save me-2"></i>
+                    Update Project
+                  </button>
+                </div>
+              </form>
+            </div>
           </div>
         </div>
       )}

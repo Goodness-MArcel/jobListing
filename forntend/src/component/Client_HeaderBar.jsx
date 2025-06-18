@@ -107,7 +107,7 @@ const Client_HeaderBar = ({ userName, userEmail, onLogout }) => (
                     <button 
                       className="dropdown-item text-danger" 
                       onClick={onLogout}
-                      style={{ cursor: 'pointer', border: 'none', backgroundColor: 'orange', width: '100%', textAlign: 'left' }}
+                      style={{ cursor: 'pointer', border: 'none', backgroundColor: '', width: '100%', textAlign: 'left', fontWeight: 'bold' }}
                     >
                       <i className="fas fa-sign-out-alt me-2"></i>Logout
                     </button>

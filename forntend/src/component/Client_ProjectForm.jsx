@@ -81,7 +81,7 @@ const Client_ProjectForm = ({userId}) => {
             <button 
               className="btn btn-sm btn-outline-light"
               onClick={() => setIsExpanded(!isExpanded)}
-              style={{ transition: 'transform 0.3s ease' , transform: isExpanded ? 'rotate(180deg)' : 'rotate(0deg)' , color: isExpanded ? '#ffc107' : 'green',width: '30px' }}
+              style={{ transition: 'transform 0.3s ease' , transform: isExpanded ? 'rotate(360deg)' : 'rotate(0deg)' , color: isExpanded ? '#ffc107' : 'green',width: '30px' }}
             >
               <i className={`fas fa-chevron-${isExpanded ? 'up' : 'down'}`}></i>
             </button>
