@@ -75,6 +75,7 @@ export const registerUser = async (userData) => {
         role: user.role,
         email: user.email,
         isVerified: user.isVerified,
+        
       },
       process.env.JWT_SECRET,
       { expiresIn: process.env.JWT_EXPIRE || "30d" }
@@ -169,6 +170,8 @@ export const loginUser = async (email, password, res) => {
       bio: user.bio,
       skills: user.skills,
       isVerified: user.isVerified,
+      profileImageUrl:user.profileImageUrl,
+      phone: user.phone,
       message: "Login successful",
     };
   } catch (error) {

@@ -45,7 +45,7 @@ const LoginPage = () => {
       
       // Make login request with credentials - Fixed URL
       const response = await axios.post(
-        "http://localhost:3000/api/auth/login", // Fixed port number
+        "/api/auth/login", // Fixed port number
         {
           email: formData.email,
           password: formData.password

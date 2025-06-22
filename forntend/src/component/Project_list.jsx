@@ -41,7 +41,7 @@ function ProjectList({ clientId }) {
       }
 
       const response = await fetch(
-        `http://localhost:3000/api/projects/client?${queryParams}`,
+        `/api/projects/client?${queryParams}`,
         {
           method: "GET",
           headers: {
@@ -90,7 +90,7 @@ function ProjectList({ clientId }) {
       }
 
       const response = await fetch(
-        `http://localhost:3000/api/projects/projects/${projectId}?client_id=${currentClientId}`,
+        `/api/projects/projects/${projectId}?client_id=${currentClientId}`,
         {
           method: "DELETE",
           headers: {
@@ -161,7 +161,7 @@ function ProjectList({ clientId }) {
       };
 
       const response = await fetch(
-        `http://localhost:3000/api/projects/projects/${editingProject.id}?client_id=${currentClientId}`,
+        `/api/projects/projects/${editingProject.id}?client_id=${currentClientId}`,
         {
           method: "PUT",
           headers: {

@@ -40,7 +40,7 @@ const Client_ProjectForm = ({userId}) => {
   };
 
   try {
-    const response = await fetch(`http://localhost:3000/api/projects/add-project?client_id=${userId}`, {
+    const response = await fetch(`/api/projects/add-project?client_id=${userId}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

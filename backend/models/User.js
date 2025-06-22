@@ -46,6 +46,34 @@ User.init(
       type: DataTypes.ARRAY(DataTypes.STRING),
       defaultValue: [],
     },
+    phone: {
+      type: DataTypes.STRING,
+      allowNull: true,
+      validate: {
+        len: [10, 20],
+      },
+    },
+    website: {
+      type: DataTypes.STRING,
+      allowNull: true,
+      validate: {
+        isUrl: true,
+      },
+    },
+    company: {
+      type: DataTypes.STRING,
+      allowNull: true,
+      validate: {
+        len: [2, 100],
+      },
+    },
+    location: {
+      type: DataTypes.STRING,
+      allowNull: true,
+      validate: {
+        len: [2, 100],
+      },
+    },
     isVerified: {
       type: DataTypes.BOOLEAN,
       defaultValue: false,

@@ -1,6 +1,12 @@
 import express from 'express';
 import http from 'http';
 import cookieParser from 'cookie-parser';
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
 import { sequelize, User, Bid, Project, Review, Message } from './models/index.js';
 import { initializeSocket } from './socketService.js';
 import session from 'express-session';
@@ -11,6 +17,7 @@ import morgan from 'morgan';
 // import authRoutes from './routes/authRoutes.js';
 import router from './routes/authRoutes.js';
 import addProject from './routes/postProject_routes.js';
+import Clienrouter from './routes/clientRoutes.js';
 import errorHandler from './utils/errorHandler.js';
 import cors from 'cors';
 
@@ -47,6 +54,7 @@ app.use(morgan('dev'));
 app.use(cors(corsOptions));
 app.use(express.json());
 app.use(cookieParser());
+app.use('/uploads', express.static(join(__dirname, 'uploads'))); // Serve static files from 'public' directory
 app.use(express.urlencoded({ extended: true }));
 app.use((req, res, next) => {
   req.io = io;
@@ -63,6 +71,7 @@ app.use(session({
 // app.use('/', router)
 app.use('/api/auth', router);
 app.use('/api/projects', addProject);
+app.use('/api/client', Clienrouter);
 
 // Error handling middleware
 app.use(errorHandler);
