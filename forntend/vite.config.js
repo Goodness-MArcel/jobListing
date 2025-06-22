@@ -6,15 +6,15 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'https://joblisting-frontend.onrender.com',
+        target: 'https://joblisting-backend-m2wa.onrender.com',
         changeOrigin: true,
         secure: false,
         rewrite: (path) => path.replace(/^\/api/, '/api') // Keep '/api' prefix
       },
-      '/socket.io': {
-        target: 'http://localhost:3000',
-        ws: true
-      }
+      // '/socket.io': {
+      //   target: 'http://localhost:3000',
+      //   ws: true
+      // }
     }
   }
 });
