@@ -8,7 +8,7 @@ export default defineConfig({
       '/api': {
         target: 'https://joblisting-backend-m2wa.onrender.com',
         changeOrigin: true,
-        secure: false,
+        secure: true,
         rewrite: (path) => path.replace(/^\/api/, '/api') // Keep '/api' prefix
       },
       // '/socket.io': {
