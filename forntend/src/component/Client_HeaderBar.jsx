@@ -35,7 +35,7 @@ const Client_HeaderBar = ({
       }
 
       const response = await fetch(
-        `/api/client/profile?client_id=${clientData.id}`,
+        `https://joblisting-backend-m2wa.onrender.com/api/client/profile?client_id=${clientData.id}`,
         {
           method: "PUT",
           credentials: "include", // Ensures cookies are sent
