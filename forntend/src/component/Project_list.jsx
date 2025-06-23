@@ -41,7 +41,7 @@ function ProjectList({ clientId }) {
       }
 
       const response = await fetch(
-        `/api/projects/client?${queryParams}`,
+        `https://joblisting-backend-m2wa.onrender.com/api/projects/client?${queryParams}`,
         {
           method: "GET",
           headers: {
@@ -90,7 +90,7 @@ function ProjectList({ clientId }) {
       }
 
       const response = await fetch(
-        `/api/projects/projects/${projectId}?client_id=${currentClientId}`,
+        `https://joblisting-backend-m2wa.onrender.com/api/projects/projects/${projectId}?client_id=${currentClientId}`,
         {
           method: "DELETE",
           headers: {
@@ -161,7 +161,7 @@ function ProjectList({ clientId }) {
       };
 
       const response = await fetch(
-        `/api/projects/projects/${editingProject.id}?client_id=${currentClientId}`,
+        `https://joblisting-backend-m2wa.onrender.com/api/projects/projects/${editingProject.id}?client_id=${currentClientId}`,
         {
           method: "PUT",
           headers: {
