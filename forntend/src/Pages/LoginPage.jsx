@@ -45,7 +45,7 @@ const LoginPage = () => {
       
       // Make login request with credentials - Fixed URL
       const response = await axios.post(
-        "/api/auth/login", // Fixed port number
+        "https://joblisting-backend-m2wa.onrender.com/api/auth/login", // Fixed port number
         {
           email: formData.email,
           password: formData.password
