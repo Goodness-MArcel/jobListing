@@ -75,9 +75,8 @@ export const registerUser = async (userData) => {
         role: user.role,
         email: user.email,
         isVerified: user.isVerified,
-        
       },
-      process.env.JWT_SECRET,
+      process.env.JWT_SECRET, // Make sure this matches your .env
       { expiresIn: process.env.JWT_EXPIRE || "30d" }
     );
 
@@ -104,6 +103,8 @@ export const registerUser = async (userData) => {
 
 export const loginUser = async (email, password, res) => {
   try {
+    console.log('Login attempt for:', email); // Debug log
+
     // 1. Check if user exists
     const user = await User.scope("withPassword").findOne({ where: { email } });
     if (!user) {
@@ -140,6 +141,10 @@ export const loginUser = async (email, password, res) => {
     await user.update({ lastLogin: new Date() });
 
     // 6. Generate JWT token
+    if (!process.env.JWT_SECRET) {
+      throw new Error("JWT_SECRET is not set in environment variables");
+    }
+
     const token = jwt.sign(
       {
         id: user.id,
@@ -151,24 +156,21 @@ export const loginUser = async (email, password, res) => {
       { expiresIn: process.env.JWT_EXPIRE || "30d" }
     );
 
-    // 7. Set cookie with JWT token
+    // 7. Set cookie with JWT token - CONSISTENT configuration
     const cookieOptions = {
       httpOnly: true,
-      secure: true, // Always true for HTTPS
-      sameSite: 'none', // Required for cross-origin
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
       maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
       path: '/'
     };
 
-    // Add domain for production
-    if (process.env.NODE_ENV === 'production') {
-      cookieOptions.domain = '.onrender.com'; // Allow subdomain sharing
-    }
-
+    // Don't set domain for Render.com - let it use the current domain
+    console.log('Setting cookie with options:', cookieOptions); // Debug log
     res.cookie('token', token, cookieOptions);
 
-    // 8. Return user data (with token for localStorage fallback)
-    return {
+    // 8. Return user data WITH token for localStorage fallback
+    const userData = {
       id: user.id,
       firstName: user.firstName,
       lastName: user.lastName,
@@ -177,11 +179,15 @@ export const loginUser = async (email, password, res) => {
       bio: user.bio,
       skills: user.skills,
       isVerified: user.isVerified,
-      profileImageUrl:user.profileImageUrl,
+      profileImageUrl: user.profileImageUrl,
       phone: user.phone,
-      token: token,
+      token: token, // Include token in response
       message: "Login successful",
     };
+
+    console.log('Login successful for user:', user.id); // Debug log
+    return userData;
+
   } catch (error) {
     console.error('Login service error:', error);
     if (!error.statusCode) {
@@ -192,12 +198,31 @@ export const loginUser = async (email, password, res) => {
 };
 
 export const logoutUser = (res) => {
-  res.clearCookie('token', {
-    path: '/',
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax'
-  });
+  try {
+    res.clearCookie('token', {
+      path: '/',
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax'
+    });
+    console.log('Cookie cleared successfully'); // Debug log
+  } catch (error) {
+    console.error('Logout error:', error);
+    throw error;
+  }
 };
 
-export default { registerUser, loginUser, logoutUser };
+// Add a function to verify tokens
+export const verifyToken = (token) => {
+  try {
+    if (!process.env.JWT_SECRET) {
+      throw new Error("JWT_SECRET is not set");
+    }
+    return jwt.verify(token, process.env.JWT_SECRET);
+  } catch (error) {
+    console.error('Token verification error:', error);
+    return null;
+  }
+};
+
+export default { registerUser, loginUser, logoutUser, verifyToken };
