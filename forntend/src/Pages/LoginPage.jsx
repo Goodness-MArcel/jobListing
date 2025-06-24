@@ -58,10 +58,15 @@ const LoginPage = () => {
         }
       );
 
-      // Store user data in localStorage (without sensitive info)
+      // Store user data in localStorage (including token)
       if (response.data.data) {
         const userData = response.data.data;
         localStorage.setItem("user", JSON.stringify(userData));
+        
+        // Also store token separately for API calls
+        if (userData.token) {
+          localStorage.setItem("token", userData.token);
+        }
       }
 
       // Redirect based on role

@@ -152,15 +152,22 @@ export const loginUser = async (email, password, res) => {
     );
 
     // 7. Set cookie with JWT token
-    res.cookie('token', token, {
+    const cookieOptions = {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+      secure: true, // Always true for HTTPS
+      sameSite: 'none', // Required for cross-origin
       maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
       path: '/'
-    });
+    };
 
-    // 8. Return user data (without password)
+    // Add domain for production
+    if (process.env.NODE_ENV === 'production') {
+      cookieOptions.domain = '.onrender.com'; // Allow subdomain sharing
+    }
+
+    res.cookie('token', token, cookieOptions);
+
+    // 8. Return user data (with token for localStorage fallback)
     return {
       id: user.id,
       firstName: user.firstName,
@@ -172,6 +179,7 @@ export const loginUser = async (email, password, res) => {
       isVerified: user.isVerified,
       profileImageUrl:user.profileImageUrl,
       phone: user.phone,
+      token: token,
       message: "Login successful",
     };
   } catch (error) {
