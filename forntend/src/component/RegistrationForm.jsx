@@ -65,7 +65,7 @@ const RegistrationForm = () => {
 
     try {
       setIsLoading(true);
-      const response = await axios.post("/api/auth/register", {
+      const response = await axios.post("https://joblisting-backend-m2wa.onrender.com/api/auth/register", {
         firstName: formData.firstName,
         lastName: formData.lastName,
         email: formData.email,

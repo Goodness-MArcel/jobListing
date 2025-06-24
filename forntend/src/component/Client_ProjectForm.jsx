@@ -40,7 +40,7 @@ const Client_ProjectForm = ({userId}) => {
   };
 
   try {
-    const response = await fetch(`/api/projects/add-project?client_id=${userId}`, {
+    const response = await fetch(`https://joblisting-backend-m2wa.onrender.com/api/projects/add-project?client_id=${userId}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

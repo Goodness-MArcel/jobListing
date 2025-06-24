@@ -4,14 +4,14 @@ import react from '@vitejs/plugin-react';
 export default defineConfig({
   plugins: [react()],
   server: {
-    proxy: {
-      '/api': {
-        target: 'https://joblisting-backend-m2wa.onrender.com',
-        changeOrigin: true,
-        secure: false,
-        rewrite: (path) => path.replace(/^\/api/, '/api') // Keep '/api' prefix
-      }
+    // proxy: {
+    //   '/api': {
+    //     target: 'https://joblisting-backend-m2wa.onrender.com',
+    //     changeOrigin: true,
+    //     secure: false,
+    //     rewrite: (path) => path.replace(/^\/api/, '/api') // Keep '/api' prefix
+    //   }
      
-    }
+    // }
   }
 });
