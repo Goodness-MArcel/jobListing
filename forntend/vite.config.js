@@ -8,13 +8,10 @@ export default defineConfig({
       '/api': {
         target: 'https://joblisting-backend-m2wa.onrender.com',
         changeOrigin: true,
-        secure: true,
+        secure: false,
         rewrite: (path) => path.replace(/^\/api/, '/api') // Keep '/api' prefix
-      },
-      // '/socket.io': {
-      //   target: 'http://localhost:3000',
-      //   ws: true
-      // }
+      }
+     
     }
   }
 });
