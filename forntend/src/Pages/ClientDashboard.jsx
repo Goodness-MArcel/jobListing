@@ -164,7 +164,7 @@ const ClientDashboard = () => {
 
   const handleLogout = useCallback(async () => {
     try {
-      await axios.post('/api/auth/logout', {}, {
+      await axios.post('https://joblisting-backend-m2wa.onrender.com/api/auth/logout', {}, {
         withCredentials: true
       });
     } catch (error) {
@@ -222,7 +222,7 @@ const ClientDashboard = () => {
         
         // Fix the API endpoint to match the backend route
         const response = await axios.get(
-          `/api/auth/info`, // Changed from /api/client/info to /api/auth/info
+          `https://joblisting-backend-m2wa.onrender.com/api/auth/info`, // Changed from /api/client/info to /api/auth/info
           { 
             withCredentials: true,
             params: {client_id: client.id}
