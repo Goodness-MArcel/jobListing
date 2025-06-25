@@ -4,92 +4,100 @@ import jwt from "jsonwebtoken";
 import { sendVerificationEmail } from "./emailService.js";
 import crypto from "crypto";
 
-// Validate JWT_SECRET on startup
-if (!process.env.JWT_SECRET) {
-  console.error('JWT_SECRET is not set in environment variables');
+// Simple JWT secret validation
+const JWT_SECRET = process.env.JWT_SECRET;
+if (!JWT_SECRET) {
+  console.error('❌ JWT_SECRET not found in authService');
   process.exit(1);
 }
 
-if (process.env.JWT_SECRET.length < 32) {
-  console.error('JWT_SECRET is too short. Use at least 32 characters.');
-  process.exit(1);
-}
+console.log('✅ AuthService JWT_SECRET loaded, length:', JWT_SECRET.length);
+
+// Simple token generation function
+const generateToken = (user) => {
+  const payload = {
+    id: user.id,
+    email: user.email,
+    role: user.role,
+    isVerified: user.isVerified
+  };
+
+  console.log('🔐 Generating token with payload:', payload);
+  console.log('🔐 Using JWT_SECRET (first 10 chars):', JWT_SECRET.substring(0, 10) + '...');
+
+  const token = jwt.sign(payload, JWT_SECRET, {
+    expiresIn: '30d'
+  });
+
+  console.log('✅ Token generated successfully');
+  return token;
+};
+
+// Simple token verification function
+const verifyToken = (token) => {
+  try {
+    console.log('🔍 Verifying token...');
+    const decoded = jwt.verify(token, JWT_SECRET);
+    console.log('✅ Token verification successful');
+    return decoded;
+  } catch (error) {
+    console.log('❌ Token verification failed:', error.message);
+    return null;
+  }
+};
 
 export const registerUser = async (userData) => {
   try {
-    // Validation
-    if (
-      !userData.firstName ||
-      !userData.lastName ||
-      !userData.email ||
-      !userData.password ||
-      !userData.role
-    ) {
-      const error = new Error("Missing required registration fields");
-      error.statusCode = 400;
-      throw error;
+    console.log('📝 Starting user registration for:', userData.email);
+
+    // Basic validation
+    const required = ['firstName', 'lastName', 'email', 'password', 'role'];
+    const missing = required.filter(field => !userData[field]);
+    
+    if (missing.length > 0) {
+      throw new Error(`Missing required fields: ${missing.join(', ')}`);
     }
 
-    // Check if user already exists
-    const existingUser = await User.findOne({
-      where: { email: userData.email },
-    });
-
+    // Check if user exists
+    const existingUser = await User.findOne({ where: { email: userData.email } });
     if (existingUser) {
-      const error = new Error("Email already in use");
-      error.statusCode = 409;
-      throw error;
+      throw new Error('Email already registered');
     }
 
     // Hash password
     const salt = await bcrypt.genSalt(12);
-    const hashed_Password = await bcrypt.hash(userData.password, salt);
+    const passwordHash = await bcrypt.hash(userData.password, salt);
 
     // Generate verification token
     const verificationToken = crypto.randomBytes(32).toString('hex');
     const verificationTokenExpires = new Date(Date.now() + 24 * 60 * 60 * 1000);
 
-    // Prepare user data
-    const userPayload = {
+    // Create user
+    const user = await User.create({
       firstName: userData.firstName,
       lastName: userData.lastName,
       email: userData.email,
-      passwordHash: hashed_Password,
+      passwordHash,
       role: userData.role,
       bio: userData.role === "freelancer" ? userData.bio : null,
-      skills: userData.role === "freelancer" ? userData.skills : [],
+      skills: userData.role === "freelancer" ? userData.skills || [] : [],
       isVerified: false,
-      verificationToken: verificationToken,
-      verificationTokenExpires: verificationTokenExpires
-    };
+      verificationToken,
+      verificationTokenExpires
+    });
 
-    let user;
+    console.log('✅ User created successfully:', user.id);
+
+    // Send verification email
     try {
-      user = await User.create(userPayload);
       await sendVerificationEmail(user);
-    } catch (err) {
-      console.error('Registration error:', err);
-      if (user && user.id) {
-        await User.destroy({ where: { id: user.id } });
-      }
-      throw err;
+      console.log('✅ Verification email sent');
+    } catch (emailError) {
+      console.log('⚠️ Email sending failed:', emailError.message);
     }
 
-    // Generate JWT token with consistent secret
-    const token = jwt.sign(
-      {
-        id: user.id,
-        role: user.role,
-        email: user.email,
-        isVerified: user.isVerified,
-      },
-      process.env.JWT_SECRET,
-      { 
-        expiresIn: process.env.JWT_EXPIRE || "30d",
-        issuer: 'jobListing-backend',
-        audience: 'jobListing-frontend'
-      }
-    );
+    // Generate token
+    const token = generateToken(user);
 
     return {
       id: user.id,
@@ -101,75 +109,64 @@ export const registerUser = async (userData) => {
       skills: user.skills,
       isVerified: user.isVerified,
       token,
-      message: "Registration successful! Please check your email to verify your account.",
+      message: "Registration successful! Please check your email to verify your account."
     };
+
   } catch (error) {
-    console.error('Registration service error:', error);
-    if (!error.statusCode) {
-      error.statusCode = 500;
-    }
-    throw error;
+    console.error('❌ Registration error:', error);
+    const err = new Error(error.message);
+    err.statusCode = 400;
+    throw err;
   }
 };
 
 export const loginUser = async (email, password, res) => {
   try {
-    console.log('Login attempt for:', email);
+    console.log('🔐 Login attempt for:', email);
 
-    // 1. Check if user exists
-    const user = await User.scope("withPassword").findOne({ where: { email } });
+    // Find user with password
+    const user = await User.scope("withPassword").findOne({ 
+      where: { email } 
+    });
+
     if (!user) {
-      const error = new Error("Invalid credentials");
-      error.statusCode = 401;
-      throw error;
+      console.log('❌ User not found:', email);
+      throw new Error('Invalid email or password');
     }
 
-    // 2. Check if passwordHash exists
+    console.log('👤 User found:', user.id);
+
+    // Check password
     if (!user.passwordHash) {
-      const error = new Error(
-        "Account is missing a password. Please reset your password or contact support."
-      );
-      error.statusCode = 400;
-      throw error;
+      console.log('❌ No password hash found');
+      throw new Error('Account setup incomplete. Please reset your password.');
     }
 
-    // 3. Verify password
-    const isPasswordValid = await bcrypt.compare(password, user.passwordHash);
-    if (!isPasswordValid) {
-      const error = new Error("Invalid credentials");
-      error.statusCode = 401;
-      throw error;
+    const isValidPassword = await bcrypt.compare(password, user.passwordHash);
+    if (!isValidPassword) {
+      console.log('❌ Invalid password');
+      throw new Error('Invalid email or password');
     }
 
-    // 4. Check if account is verified
-    if (user.isVerified === false) {
-      const error = new Error("Please verify your email first");
+    console.log('✅ Password valid');
+
+    // Check verification status
+    if (!user.isVerified) {
+      console.log('❌ User not verified');
+      const error = new Error('Please verify your email first');
       error.statusCode = 403;
       throw error;
     }
 
-    // 5. Update last login
+    console.log('✅ User verified');
+
+    // Update last login
     await user.update({ lastLogin: new Date() });
 
-    // 6. Generate JWT token with SAME secret and options
-    const token = jwt.sign(
-      {
-        id: user.id,
-        role: user.role,
-        email: user.email,
-        isVerified: user.isVerified,
-      },
-      process.env.JWT_SECRET,
-      { 
-        expiresIn: process.env.JWT_EXPIRE || "30d",
-        issuer: 'jobListing-backend',
-        audience: 'jobListing-frontend'
-      }
-    );
+    // Generate token
+    const token = generateToken(user);
 
-    console.log('Token generated successfully for user:', user.id);
-
-    // 7. Set cookie with consistent configuration
+    // Set cookie
     const cookieOptions = {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
@@ -179,8 +176,8 @@ export const loginUser = async (email, password, res) => {
     };
 
     res.cookie('token', token, cookieOptions);
+    console.log('🍪 Cookie set successfully');
 
-    // 8. Return user data WITH token
     const userData = {
       id: user.id,
       firstName: user.firstName,
@@ -192,19 +189,18 @@ export const loginUser = async (email, password, res) => {
       isVerified: user.isVerified,
       profileImageUrl: user.profileImageUrl,
       phone: user.phone,
-      token: token, // Include token for localStorage fallback
-      message: "Login successful",
+      token, // Include for localStorage fallback
+      message: "Login successful"
     };
 
-    console.log('Login successful for user:', user.id);
+    console.log('✅ Login successful for:', email);
     return userData;
 
   } catch (error) {
-    console.error('Login service error:', error);
-    if (!error.statusCode) {
-      error.statusCode = 500;
-    }
-    throw error;
+    console.error('❌ Login error:', error);
+    const err = new Error(error.message);
+    err.statusCode = error.statusCode || 401;
+    throw err;
   }
 };
 
@@ -216,22 +212,10 @@ export const logoutUser = (res) => {
       secure: process.env.NODE_ENV === 'production',
       sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax'
     });
-    console.log('User logged out successfully');
+    console.log('✅ User logged out successfully');
   } catch (error) {
-    console.error('Logout error:', error);
+    console.error('❌ Logout error:', error);
     throw error;
-  }
-};
-
-export const verifyToken = (token) => {
-  try {
-    return jwt.verify(token, process.env.JWT_SECRET, {
-      issuer: 'jobListing-backend',
-      audience: 'jobListing-frontend'
-    });
-  } catch (error) {
-    console.error('Token verification error:', error);
-    return null;
   }
 };
 

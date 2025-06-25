@@ -13,6 +13,7 @@ const LoginPage = () => {
     password: "",
   });
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [validated, setValidated] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -24,11 +25,29 @@ const LoginPage = () => {
       ...prev,
       [name]: value,
     }));
+    // Clear errors when user starts typing
+    if (error) setError("");
+  };
+
+  const clearAllTokens = () => {
+    console.log('🧹 Clearing all existing tokens...');
+    
+    // Clear localStorage
+    localStorage.removeItem("user");
+    localStorage.removeItem("token");
+    
+    // Clear cookies by setting them to expire
+    document.cookie = 'token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=.onrender.com;';
+    document.cookie = 'token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+    
+    console.log('✅ All tokens cleared');
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     const form = e.currentTarget;
+
+    console.log('🔐 Login form submitted');
 
     // Form validation
     if (form.checkValidity() === false) {
@@ -38,38 +57,47 @@ const LoginPage = () => {
     }
 
     setError("");
+    setSuccess("");
     setValidated(true);
+    setIsLoading(true);
 
     try {
-      setIsLoading(true);
+      // Clear any existing invalid tokens first
+      clearAllTokens();
+
+      console.log('📡 Sending login request...');
       
-      // Clear any existing invalid tokens
-      localStorage.removeItem("user");
-      localStorage.removeItem("token");
-      
-      // Make login request
       const response = await axios.post(
         "https://joblisting-backend-m2wa.onrender.com/api/auth/login",
         {
-          email: formData.email,
+          email: formData.email.trim(),
           password: formData.password
         },
         {
           withCredentials: true,
           headers: {
-            'Content-Type': 'application/json'
-          }
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          },
+          timeout: 30000 // 30 second timeout
         }
       );
 
-      console.log('Login response:', response.data);
+      console.log('✅ Login response received:', response.status);
+      console.log('Response data:', response.data);
 
-      // Store user data and token
-      if (response.data.data) {
+      if (response.data.success && response.data.data) {
         const userData = response.data.data;
         
-        // Store user data (without token for security)
-        const userDataForStorage = {
+        console.log('👤 User data received:', {
+          id: userData.id,
+          email: userData.email,
+          role: userData.role,
+          isVerified: userData.isVerified
+        });
+
+        // Store user data (without sensitive info)
+        const safeUserData = {
           id: userData.id,
           firstName: userData.firstName,
           lastName: userData.lastName,
@@ -82,46 +110,76 @@ const LoginPage = () => {
           phone: userData.phone
         };
         
-        localStorage.setItem("user", JSON.stringify(userDataForStorage));
+        localStorage.setItem("user", JSON.stringify(safeUserData));
         
-        // Store token separately for API calls (fallback)
+        // Store token for API calls (fallback if cookies don't work)
         if (userData.token) {
           localStorage.setItem("token", userData.token);
+          console.log('🔐 Token stored in localStorage');
         }
 
-        console.log('User data stored successfully');
-      }
+        setSuccess("Login successful! Redirecting...");
+        
+        // Small delay to show success message
+        setTimeout(() => {
+          const redirectPath = userData.role === "client" 
+            ? "/client-dashboard" 
+            : "/freelancer-dashboard";
+          
+          console.log('🚀 Redirecting to:', redirectPath);
+          navigate(redirectPath, { replace: true });
+        }, 1000);
 
-      // Redirect based on role
-      const redirectPath = response.data.data?.role === "client" 
-        ? "/client-dashboard" 
-        : "/freelancer-dashboard";
-      
-      console.log('Redirecting to:', redirectPath);
-      navigate(redirectPath);
+      } else {
+        throw new Error('Invalid response format from server');
+      }
       
     } catch (err) {
-      console.error('Login error:', err);
+      console.error('❌ Login error:', err);
       
       // Clear any stored data on error
-      localStorage.removeItem("user");
-      localStorage.removeItem("token");
+      clearAllTokens();
       
-      // Handle different error scenarios
-      if (err.response) {
-        if (err.response.status === 401) {
-          setError("Invalid email or password");
-        } else if (err.response.status === 403) {
-          setError("Please verify your email first");
-          navigate('/verify-email', { state: { email: formData.email } });
-        } else {
-          setError(err.response.data?.message || "Login failed. Please try again.");
+      let errorMessage = "Login failed. Please try again.";
+      
+      if (err.code === 'ECONNABORTED') {
+        errorMessage = "Request timeout. Please check your connection and try again.";
+      } else if (err.response) {
+        // Server responded with error
+        console.log('Server error response:', err.response.data);
+        
+        switch (err.response.status) {
+          case 400:
+            errorMessage = "Please check your email and password format.";
+            break;
+          case 401:
+            errorMessage = "Invalid email or password.";
+            break;
+          case 403:
+            errorMessage = "Please verify your email first.";
+            // Navigate to verification page
+            setTimeout(() => {
+              navigate('/verify-email', { 
+                state: { email: formData.email },
+                replace: true 
+              });
+            }, 2000);
+            break;
+          case 429:
+            errorMessage = "Too many login attempts. Please try again later.";
+            break;
+          case 500:
+            errorMessage = "Server error. Please try again later.";
+            break;
+          default:
+            errorMessage = err.response.data?.message || "Login failed. Please try again.";
         }
       } else if (err.request) {
-        setError("Network error. Please check your connection.");
-      } else {
-        setError("An unexpected error occurred");
+        // Network error
+        errorMessage = "Network error. Please check your internet connection.";
       }
+      
+      setError(errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -135,40 +193,51 @@ const LoginPage = () => {
           <h2 className="text-center mb-4 header">Log In</h2>
 
           {error && (
-            <Alert variant="danger" className="mb-4">
-              {error}
+            <Alert variant="danger" className="mb-4" dismissible onClose={() => setError("")}>
+              <strong>Error:</strong> {error}
+            </Alert>
+          )}
+
+          {success && (
+            <Alert variant="success" className="mb-4">
+              <strong>Success:</strong> {success}
             </Alert>
           )}
 
           <Form noValidate validated={validated} onSubmit={handleSubmit}>
             <Form.Group className="mb-3" controlId="formBasicEmail">
+              <Form.Label>Email Address</Form.Label>
               <Form.Control
                 type="email"
-                placeholder="Enter email"
+                placeholder="Enter your email"
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
                 required
+                disabled={isLoading}
               />
               <Form.Control.Feedback type="invalid">
-                Please provide a valid email.
+                Please provide a valid email address.
               </Form.Control.Feedback>
             </Form.Group>
 
             <Form.Group className="mb-3" controlId="formBasicPassword">
+              <Form.Label>Password</Form.Label>
               <InputGroup>
                 <Form.Control
                   type={showPassword ? "text" : "password"}
-                  placeholder="Password"
+                  placeholder="Enter your password"
                   name="password"
                   value={formData.password}
                   onChange={handleChange}
                   required
                   minLength="6"
+                  disabled={isLoading}
                 />
                 <Button
                   variant="outline-secondary"
                   onClick={() => setShowPassword(!showPassword)}
+                  disabled={isLoading}
                   style={{
                     borderLeft: "none",
                     backgroundColor: "transparent",
@@ -179,7 +248,7 @@ const LoginPage = () => {
                 </Button>
               </InputGroup>
               <Form.Control.Feedback type="invalid">
-                Password must be at least 6 characters.
+                Password must be at least 6 characters long.
               </Form.Control.Feedback>
             </Form.Group>
 
@@ -188,16 +257,24 @@ const LoginPage = () => {
               type="submit" 
               className="w-100 mb-3 login-button"
               disabled={isLoading}
+              size="lg"
             >
-              {isLoading ? "Logging in..." : "Log In"}
+              {isLoading ? (
+                <>
+                  <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                  Logging in...
+                </>
+              ) : (
+                "Log In"
+              )}
             </Button>
 
             <div className="text-center">
               <p className="mb-1">
-                Don't have an account? <a href="/signup">Sign up</a>
+                Don't have an account? <a href="/signup" className="text-decoration-none">Sign up here</a>
               </p>
               <p className="mb-0">
-                <a href="/forgot-password">Forgot your password?</a>
+                <a href="/forgot-password" className="text-decoration-none">Forgot your password?</a>
               </p>
             </div>
           </Form>
