@@ -45,7 +45,7 @@ function Footer() {
           </Row>
           <hr className="my-4" />
           <div className="text-center text-white-50">
-            <p>&copy; {new Date().getFullYear()} JobListing. All rights reserved.</p>
+            <p>&copy; {new Date().getFullYear()} JobListing. All rights reserved Goodness.</p>
           </div>
         </Container>
       </footer>

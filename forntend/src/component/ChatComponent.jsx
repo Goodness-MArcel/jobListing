@@ -20,7 +20,7 @@ const ChatComponent = () => {
       id: 1,
       participant: {
         id: 'user-1',
-        name: 'Sarah Johnson',
+        name: 'Goodness',
         role: 'freelancer',
         avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150',
         isOnline: true
@@ -250,7 +250,8 @@ const ChatComponent = () => {
                         <div className="d-flex justify-content-between align-items-start">
                           <div className="min-width-0 flex-grow-1">
                             <h6 className="mb-1 fw-semibold text-truncate">
-                              {conversation.participant.name}
+                              {/* {conversation.participant.name} */}
+                              Goodness
                             </h6>
                             <Badge 
                               bg={getRoleColor(conversation.participant.role)} 
@@ -356,6 +357,7 @@ const ChatComponent = () => {
                         <p className="mb-1">{msg.text}</p>
                         <small className={`${msg.isOwn ? 'text-white-50' : 'text-muted'}`}>
                           {formatMessageTime(msg.timestamp)}
+                        
                         </small>
                       </div>
                     </div>

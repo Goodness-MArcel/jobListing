@@ -15,7 +15,7 @@ const ClientProjectform = lazy(() => import("../component/Client_ProjectForm.jsx
   default: memo(module.default)
 })));
 
-const ChatSidebar = lazy(() => import("../component/ChatSidebar.jsx").then(module => ({
+const ChatSidebar = lazy(() => import("../component/ChatComponent.jsx").then(module => ({
   default: memo(module.default)
 })));
 
