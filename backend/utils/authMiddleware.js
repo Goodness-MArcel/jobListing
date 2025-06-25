@@ -96,8 +96,10 @@ export const restrictTo = (...roles) => {
 
 // Add verification endpoint for protected routes
 export const verifyAuth = (req, res) => {
+  console.log('✅ Sending verification response for user:', req.user.email);
+  
   res.status(200).json({
-    success: true,
+    success: true, // ← Make sure this matches frontend expectation
     message: 'Authentication verified',
     user: {
       id: req.user.id,
@@ -106,7 +108,10 @@ export const verifyAuth = (req, res) => {
       email: req.user.email,
       role: req.user.role,
       isVerified: req.user.isVerified,
-      profileImageUrl: req.user.profileImageUrl
+      profileImageUrl: req.user.profileImageUrl,
+      bio: req.user.bio,
+      skills: req.user.skills,
+      phone: req.user.phone
     }
   });
 };
