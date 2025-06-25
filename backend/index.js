@@ -9,7 +9,7 @@ const __dirname = dirname(__filename);
 
 import { sequelize, User, Bid, Project, Review, Message } from './models/index.js';
 import { initializeSocket } from './socketService.js';
-import session from 'express-session';
+// import session from 'express-session';
 // import router from './routes/index.js';
 import { syncModels } from './models/sync.js';
 import helmet from 'helmet';
@@ -35,7 +35,8 @@ const corsOptions = {
       'http://localhost:5173',  // Vite dev server
       'http://localhost:3000',  // React dev server (if you use it)
       'http://127.0.0.1:5173',  // Alternative localhost
-      'https://joblisting-frontend.onrender.com' // Add your production domain here
+      'https://joblisting-frontend.onrender.com',
+      'https://joblisting-backend-m2wa.onrender.com' // Add your production domain here
     ];
     
     if (allowedOrigins.indexOf(origin) !== -1) {
@@ -61,17 +62,7 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use(session({
-    secret: process.env.SESSION_SECRET, // Use consistent naming
-    resave: false,
-    saveUninitialized: false,
-    cookie: { 
-      secure: process.env.NODE_ENV === 'production',
-      httpOnly: true,
-      maxAge: 24 * 60 * 60 * 1000,
-      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax'
-    }
-}));
+
 
 // app.use('/', router)
 app.use('/api/auth', router);
