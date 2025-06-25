@@ -101,7 +101,7 @@ const ProtectedRoute = () => {
     return (
       <div className="d-flex justify-content-center align-items-center" style={{ height: "100vh" }}>
         <div className="text-center">
-          <div className="spinner-border text-primary mb-3" role="status" style={{ width: '3rem', height: '3rem' }}>
+          <div className="spinner-border text-success mb-3" role="status" style={{ width: '3rem', height: '3rem' }}>
             <span className="visually-hidden">Verifying authentication...</span>
           </div>
           <p className="text-muted">Verifying your session...</p>
