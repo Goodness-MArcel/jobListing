@@ -1,9 +1,19 @@
 import User from "../models/User.js";
 import bcrypt from "bcryptjs";
-import { Op } from "sequelize";
 import jwt from "jsonwebtoken";
 import { sendVerificationEmail } from "./emailService.js";
 import crypto from "crypto";
+
+// Validate JWT_SECRET on startup
+if (!process.env.JWT_SECRET) {
+  console.error('JWT_SECRET is not set in environment variables');
+  process.exit(1);
+}
+
+if (process.env.JWT_SECRET.length < 32) {
+  console.error('JWT_SECRET is too short. Use at least 32 characters.');
+  process.exit(1);
+}
 
 export const registerUser = async (userData) => {
   try {
@@ -32,7 +42,7 @@ export const registerUser = async (userData) => {
     }
 
     // Hash password
-    const salt = await bcrypt.genSalt(10);
+    const salt = await bcrypt.genSalt(12);
     const hashed_Password = await bcrypt.hash(userData.password, salt);
 
     // Generate verification token
@@ -65,10 +75,7 @@ export const registerUser = async (userData) => {
       throw err;
     }
 
-    // Generate JWT token
-    if (!process.env.JWT_SECRET) {
-      throw new Error("JWT_SECRET is not set in environment variables");
-    }
+    // Generate JWT token with consistent secret
     const token = jwt.sign(
       {
         id: user.id,
@@ -76,8 +83,12 @@ export const registerUser = async (userData) => {
         email: user.email,
         isVerified: user.isVerified,
       },
-      process.env.JWT_SECRET, // Make sure this matches your .env
-      { expiresIn: process.env.JWT_EXPIRE || "30d" }
+      process.env.JWT_SECRET,
+      { 
+        expiresIn: process.env.JWT_EXPIRE || "30d",
+        issuer: 'jobListing-backend',
+        audience: 'jobListing-frontend'
+      }
     );
 
     return {
@@ -103,7 +114,7 @@ export const registerUser = async (userData) => {
 
 export const loginUser = async (email, password, res) => {
   try {
-    console.log('Login attempt for:', email); // Debug log
+    console.log('Login attempt for:', email);
 
     // 1. Check if user exists
     const user = await User.scope("withPassword").findOne({ where: { email } });
@@ -140,11 +151,7 @@ export const loginUser = async (email, password, res) => {
     // 5. Update last login
     await user.update({ lastLogin: new Date() });
 
-    // 6. Generate JWT token
-    if (!process.env.JWT_SECRET) {
-      throw new Error("JWT_SECRET is not set in environment variables");
-    }
-
+    // 6. Generate JWT token with SAME secret and options
     const token = jwt.sign(
       {
         id: user.id,
@@ -153,10 +160,16 @@ export const loginUser = async (email, password, res) => {
         isVerified: user.isVerified,
       },
       process.env.JWT_SECRET,
-      { expiresIn: process.env.JWT_EXPIRE || "30d" }
+      { 
+        expiresIn: process.env.JWT_EXPIRE || "30d",
+        issuer: 'jobListing-backend',
+        audience: 'jobListing-frontend'
+      }
     );
 
-    // 7. Set cookie with JWT token - CONSISTENT configuration
+    console.log('Token generated successfully for user:', user.id);
+
+    // 7. Set cookie with consistent configuration
     const cookieOptions = {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
@@ -165,11 +178,9 @@ export const loginUser = async (email, password, res) => {
       path: '/'
     };
 
-    // Don't set domain for Render.com - let it use the current domain
-    console.log('Setting cookie with options:', cookieOptions); // Debug log
     res.cookie('token', token, cookieOptions);
 
-    // 8. Return user data WITH token for localStorage fallback
+    // 8. Return user data WITH token
     const userData = {
       id: user.id,
       firstName: user.firstName,
@@ -181,11 +192,11 @@ export const loginUser = async (email, password, res) => {
       isVerified: user.isVerified,
       profileImageUrl: user.profileImageUrl,
       phone: user.phone,
-      token: token, // Include token in response
+      token: token, // Include token for localStorage fallback
       message: "Login successful",
     };
 
-    console.log('Login successful for user:', user.id); // Debug log
+    console.log('Login successful for user:', user.id);
     return userData;
 
   } catch (error) {
@@ -205,20 +216,19 @@ export const logoutUser = (res) => {
       secure: process.env.NODE_ENV === 'production',
       sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax'
     });
-    console.log('Cookie cleared successfully'); // Debug log
+    console.log('User logged out successfully');
   } catch (error) {
     console.error('Logout error:', error);
     throw error;
   }
 };
 
-// Add a function to verify tokens
 export const verifyToken = (token) => {
   try {
-    if (!process.env.JWT_SECRET) {
-      throw new Error("JWT_SECRET is not set");
-    }
-    return jwt.verify(token, process.env.JWT_SECRET);
+    return jwt.verify(token, process.env.JWT_SECRET, {
+      issuer: 'jobListing-backend',
+      audience: 'jobListing-frontend'
+    });
   } catch (error) {
     console.error('Token verification error:', error);
     return null;

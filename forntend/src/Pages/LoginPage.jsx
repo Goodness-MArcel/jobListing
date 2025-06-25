@@ -43,30 +43,53 @@ const LoginPage = () => {
     try {
       setIsLoading(true);
       
-      // Make login request with credentials - Fixed URL
+      // Clear any existing invalid tokens
+      localStorage.removeItem("user");
+      localStorage.removeItem("token");
+      
+      // Make login request
       const response = await axios.post(
-        "https://joblisting-backend-m2wa.onrender.com/api/auth/login", // Fixed port number
+        "https://joblisting-backend-m2wa.onrender.com/api/auth/login",
         {
           email: formData.email,
           password: formData.password
         },
         {
-          withCredentials: true, // Essential for cookies
+          withCredentials: true,
           headers: {
             'Content-Type': 'application/json'
           }
         }
       );
 
-      // Store user data in localStorage (including token)
+      console.log('Login response:', response.data);
+
+      // Store user data and token
       if (response.data.data) {
         const userData = response.data.data;
-        localStorage.setItem("user", JSON.stringify(userData));
         
-        // Also store token separately for API calls
+        // Store user data (without token for security)
+        const userDataForStorage = {
+          id: userData.id,
+          firstName: userData.firstName,
+          lastName: userData.lastName,
+          email: userData.email,
+          role: userData.role,
+          bio: userData.bio,
+          skills: userData.skills,
+          isVerified: userData.isVerified,
+          profileImageUrl: userData.profileImageUrl,
+          phone: userData.phone
+        };
+        
+        localStorage.setItem("user", JSON.stringify(userDataForStorage));
+        
+        // Store token separately for API calls (fallback)
         if (userData.token) {
           localStorage.setItem("token", userData.token);
         }
+
+        console.log('User data stored successfully');
       }
 
       // Redirect based on role
@@ -74,10 +97,15 @@ const LoginPage = () => {
         ? "/client-dashboard" 
         : "/freelancer-dashboard";
       
+      console.log('Redirecting to:', redirectPath);
       navigate(redirectPath);
       
     } catch (err) {
       console.error('Login error:', err);
+      
+      // Clear any stored data on error
+      localStorage.removeItem("user");
+      localStorage.removeItem("token");
       
       // Handle different error scenarios
       if (err.response) {

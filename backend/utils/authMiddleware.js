@@ -1,85 +1,112 @@
-import jwt from "jsonwebtoken";
-import User from "../models/User.js";
+import jwt from 'jsonwebtoken';
+import User from '../models/User.js';
+
+// Validate JWT_SECRET on startup
+if (!process.env.JWT_SECRET) {
+  console.error('JWT_SECRET is not set in authMiddleware');
+  process.exit(1);
+}
 
 export const protect = async (req, res, next) => {
   try {
-    // 1. Get token from cookie
     let token;
-    if (req.cookies.token) {
+
+    // Get token from cookie first (preferred)
+    if (req.cookies && req.cookies.token) {
       token = req.cookies.token;
+      console.log('Token found in cookies');
     }
-    
+    // Fallback to Authorization header
+    else if (req.headers.authorization && req.headers.authorization.startsWith('Bearer ')) {
+      token = req.headers.authorization.substring(7);
+      console.log('Token found in Authorization header');
+    }
+
     if (!token) {
-      throw new Error('Not authorized, no token');
-    }
-    
-    // 2. Verify token
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    
-    // 3. Check if user still exists
-    const currentUser = await User.findByPk(decoded.id);
-    if (!currentUser) {
-      throw new Error('The user belonging to this token no longer exists');
-    }
-    
-    // 4. Grant access to protected route
-    req.user = currentUser;
-    next();
-  } catch (err) {
-    console.error('Auth middleware error:', err);
-    // Handle different response types
-    if (req.accepts('json')) {
       return res.status(401).json({
-        status: 'fail',
-        message: 'Please log in to access this resource'
+        success: false,
+        message: 'Access denied. No token provided.'
       });
     }
+
+    // Verify token with SAME secret and options as login
+    const decoded = jwt.verify(token, process.env.JWT_SECRET, {
+      issuer: 'jobListing-backend',
+      audience: 'jobListing-frontend'
+    });
+
+    console.log('Token verified successfully for user:', decoded.id);
     
-    // For traditional web apps, redirect to login
-    return res.redirect('/login');
+    // Get user from database
+    const user = await User.findByPk(decoded.id);
+    if (!user) {
+      return res.status(401).json({
+        success: false,
+        message: 'Invalid token. User not found.'
+      });
+    }
+
+    // Check if user is still verified
+    if (!user.isVerified) {
+      return res.status(401).json({
+        success: false,
+        message: 'Account not verified.'
+      });
+    }
+
+    req.user = user;
+    next();
+  } catch (error) {
+    console.error('Auth middleware error:', error);
+    
+    // Clear invalid cookie
+    res.clearCookie('token', {
+      path: '/',
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax'
+    });
+
+    return res.status(401).json({
+      success: false,
+      message: 'Invalid or expired token.',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
   }
 };
 
 export const restrictTo = (...roles) => {
   return (req, res, next) => {
-    if (!roles.includes(req.user.role)) {
-      if (req.accepts('json')) {
-        return res.status(403).json({
-          status: 'fail',
-          message: 'You do not have permission to perform this action'
-        });
-      }
-      
-      return res.redirect('/dashboard');
+    if (!req.user) {
+      return res.status(401).json({
+        success: false,
+        message: 'Authentication required.'
+      });
     }
-    
+
+    if (!roles.includes(req.user.role)) {
+      return res.status(403).json({
+        success: false,
+        message: 'Access denied. Insufficient permissions.'
+      });
+    }
     next();
   };
 };
 
 // Add verification endpoint for protected routes
-export const verifyAuth = async (req, res) => {
-  try {
-    // User is already attached by protect middleware
-    const user = req.user;
-    
-    res.status(200).json({
-      status: 'success',
-      data: {
-        id: user.id,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        email: user.email,
-        role: user.role,
-        bio: user.bio,
-        skills: user.skills,
-        isVerified: user.isVerified
-      }
-    });
-  } catch (error) {
-    res.status(500).json({
-      status: 'error',
-      message: 'Server error during verification'
-    });
-  }
+export const verifyAuth = (req, res) => {
+  res.status(200).json({
+    success: true,
+    message: 'Authentication verified',
+    user: {
+      id: req.user.id,
+      firstName: req.user.firstName,
+      lastName: req.user.lastName,
+      email: req.user.email,
+      role: req.user.role,
+      isVerified: req.user.isVerified,
+      profileImageUrl: req.user.profileImageUrl
+    }
+  });
 };
