@@ -4,16 +4,20 @@ import jwt from "jsonwebtoken";
 import { sendVerificationEmail } from "./emailService.js";
 import crypto from "crypto";
 
-// Simple JWT secret validation
+// Get JWT_SECRET and log it
 const JWT_SECRET = process.env.JWT_SECRET;
+console.log('🔐 AuthService JWT_SECRET loaded:', {
+  exists: !!JWT_SECRET,
+  length: JWT_SECRET?.length,
+  firstChars: JWT_SECRET?.substring(0, 10) + '...'
+});
+
 if (!JWT_SECRET) {
   console.error('❌ JWT_SECRET not found in authService');
   process.exit(1);
 }
 
-console.log('✅ AuthService JWT_SECRET loaded, length:', JWT_SECRET.length);
-
-// Simple token generation function
+// Token generation function with debugging
 const generateToken = (user) => {
   const payload = {
     id: user.id,
@@ -29,7 +33,16 @@ const generateToken = (user) => {
     expiresIn: '30d'
   });
 
-  console.log('✅ Token generated successfully');
+  console.log('✅ Token generated successfully (first 50 chars):', token.substring(0, 50) + '...');
+  
+  // Immediately test the token we just generated
+  try {
+    const testDecode = jwt.verify(token, JWT_SECRET);
+    console.log('✅ Token verification test passed:', testDecode);
+  } catch (testError) {
+    console.log('❌ Token verification test failed:', testError.message);
+  }
+
   return token;
 };
 
